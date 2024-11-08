@@ -4,7 +4,7 @@ import random
 from flask_sqlalchemy import SQLAlchemy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+import datetime
 app = Flask(__name__)
 
 # load files===========================================================================================================
@@ -13,7 +13,7 @@ train_data = pd.read_csv("models/clean_data.csv")
 
 # database configuration---------------------------------------
 app.secret_key = "alskdjfwoeieiurlskdjfslkdjf"
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:@localhost/ecom"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678@localhost:5432/postgres'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -118,8 +118,7 @@ def signup():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-
-        new_signup = Signup(username=username, email=email, password=password)
+        new_signup = Signup(id = 1,username=username, email=email, password=password)
         db.session.add(new_signup)
         db.session.commit()
 
@@ -171,4 +170,6 @@ def recommendations():
 
 
 if __name__=='__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
