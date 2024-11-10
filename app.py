@@ -2,9 +2,11 @@ from flask import Flask, request, render_template
 import pandas as pd
 import random
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.postgresql import UUID
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import datetime
+import uuid
 app = Flask(__name__)
 
 # load files===========================================================================================================
@@ -20,7 +22,7 @@ db = SQLAlchemy(app)
 
 # Define your model class for the 'signup' table
 class Signup(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
@@ -118,7 +120,15 @@ def signup():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        new_signup = Signup(id = 1,username=username, email=email, password=password)
+        
+        # Tạo ID ngẫu nhiên và kiểm tra trùng lặp
+        while True:
+            random_id = random.randint(1000, 9999)  # Tạo số ngẫu nhiên với 4 chữ số
+            existing_user = Signup.query.filter_by(id=random_id).first()
+            if not existing_user:  # Nếu không có user nào với ID này, thoát khỏi vòng lặp
+                break
+        
+        new_signup = Signup(id=random_id, username=username, email=email, password=password)
         db.session.add(new_signup)
         db.session.commit()
 
