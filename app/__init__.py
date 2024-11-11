@@ -19,6 +19,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 import uuid
+
 # load files===========================================================================================================
 trending_products = pd.read_csv("app/models/trending_products.csv")
 train_data = pd.read_csv("app/models/clean_data.csv")
@@ -27,6 +28,7 @@ train_data = pd.read_csv("app/models/clean_data.csv")
 
 load_dotenv()
 app = Flask(__name__)
+
 app.register_blueprint(admin)
 
 app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]

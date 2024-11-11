@@ -1,5 +1,14 @@
+body {
+	margin: 0;
+	padding: 0;
+}
+
+
 .main {
 	padding: 10vh 0;
+	width: 100%;
+	margin: 0;
+
 }
 
 a:hover {
@@ -15,7 +24,9 @@ footer {
 	box-shadow: 1px 0 2px 0 rgba(0, 0, 0, 0.2), 1px 0 5px 0 rgba(0, 0, 0, 0.19);
 }
 
-.forms, .flash-error, .success {
+.forms,
+.flash-error,
+.success {
 	margin: 0 auto;
 	max-width: 400px;
 }
@@ -26,18 +37,21 @@ form .btn {
 	border-radius: 5px;
 }
 
-.flash-error, .help-block, .success {
+.flash-error,
+.help-block,
+.success {
 	text-align: center;
 	padding: 5px;
-	font-weight:bold;
+	font-weight: bold;
 }
 
-.flash-error, .help-block {
+.flash-error,
+.help-block {
 	color: red;
 }
 
 .success {
-	color:green;
+	color: green;
 }
 
 .items {
@@ -50,7 +64,7 @@ form .btn {
 }
 
 .item {
-	width:250px;
+	width: 250px;
 	padding: 12px;
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.19);
 	border-radius: 5px;
@@ -76,7 +90,8 @@ form .btn {
 	background-color: red;
 }
 
-.add-to-cart, .remove-from-cart {
+.add-to-cart,
+.remove-from-cart {
 	width: 100%;
 	border: none;
 	color: white;
@@ -86,7 +101,7 @@ form .btn {
 }
 
 .pic {
-	width:150px;
+	width: 150px;
 	height: 150px;
 }
 
@@ -97,8 +112,8 @@ form .btn {
 }
 
 .right-item {
-	float:right;
-	color:green;
+	float: right;
+	color: green;
 }
 
 .check {
@@ -109,9 +124,9 @@ form .btn {
 }
 
 .checkout {
-	cursor:pointer;
+	cursor: pointer;
 	padding: 5px;
-	border-radius:5px;
+	border-radius: 5px;
 }
 
 .details {

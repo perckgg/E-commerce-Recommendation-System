@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Amazon Header</title>
+    <style>
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header styling */
+        .header {
+            background-color: #00331a;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            color: white;
+        }
+
+        /* Logo */
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        /* Delivery Location */
+        .location {
+            font-size: 0.9rem;
+            margin-right: 20px;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar select,
+        .search-bar input {
+            padding: 8px;
+            border: none;
+            outline: none;
+        }
+
+        .search-bar select {
+            background-color: #e6e6e6;
+            color: black;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding-left: 10px;
+        }
+
+        .search-bar button {
+            background-color: #c00073;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Menu Links */
+        .menu-links {
+            display: flex;
+            gap: 20px;
+            margin-left: 20px;
+            align-items: center;
+        }
+
+        .menu-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        /* Cart Icon */
+        .cart {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            font-size: 1.2rem;
+        }
+
+        .cart .count {
+            color: #c00073;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+
+        .sidebar {
+            width: 250px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .category-list {
+            width: 100%;
+            padding: 0px;
+        }
+
+        .category-item {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            transition: background-color 0.3s;
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .category-item .icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        .category-item span {
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">Amazon</div>
+        <div class="location">Deliver to Vietnam</div>
+        <div class="search-bar">
+            <select>
+                <option value="all">All</option>
+            </select>
+            <input type="text" placeholder="Search Amazon">
+            <button>🔍</button>
+        </div>
+        <div class="" style="display: flex; place-items: center;">
+            <ul class="menu-links">
+                <li class="nav-item active">
+                    <a class="nav-link" href="index"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="settingsLink"><i class="fas fa-cog"></i> Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary mr-2" href="#" data-toggle="modal"
+                        data-target="#signupModal">Sign
+                        Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary" href="#" data-toggle="modal" data-target="#signinModal">Sign
+                        In</a>
+                </li>
+            </ul>
+        </div>
+        <div class="cart">
+            Cart <span class="count">(0)</span>
+        </div>
+    </div>
+
+    <div style="display: flex; flex-direction: row;">
+
+        <!-- Sidebar for category -->
+        <div class="sidebar">
+            <h2>Category</h2>
+            <ul class="category-list">
+                <li class="category-item">
+                    <img src="app/static/img/img_1.png" alt="Book Icon" class="icon">
+                    <span>Nhà Sách Tiki</span>
+                </li>
+                <li class="category-item">
+                    <img src="path/to/pot-icon.png" alt="Pot Icon" class="icon">
+                    <span>Nhà Cửa - Đời Sống</span>
+                </li>
+                <li class="category-item">
+                    <img src="path/to/phone-icon.png" alt="Phone Icon" class="icon">
+                    <span>Điện Thoại - Máy Tính Bảng</span>
+                </li>
+                <li class="category-item">
+                    <img src="path/to/toy-icon.png" alt="Toy Icon" class="icon">
+                    <span>Đồ Chơi - Mẹ & Bé</span>
+                </li>
+                <li class="category-item">
+                    <img src="path/to/headphone-icon.png" alt="Headphone Icon" class="icon">
+                    <span>Thiết Bị Số - Phụ Kiện Số</span>
+                </li>
+                <li class="category-item">
+                    <img src="path/to/appliance-icon.png" alt="Appliance Icon" class="icon">
+                    <span>Điện Gia Dụng</span>
+                </li>
+                <li class="category-item">
+                    <img src="path/to/beauty-icon.png" alt="Beauty Icon" class="icon">
+                    <span>Làm Đẹp - Sức Khỏe</span>
+                </li>
+                <li class="category-item">
+                    <img src="path/to/bike-icon.png" alt="Bike Icon" class="icon">
+                    <span>Ô Tô - Xe Máy - Xe Đạp</span>
+                </li>
+                <li class="category-item">
+                    <img src="path/to/fashion-icon.png" alt="Fashion Icon" class="icon">
+                    <span>Thời trang nữ</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="flex-container">
+            <div class="item">Item 1</div>
+            <div class="item">Item 2</div>
+            <div class="item">Item 3</div>
+            <div class="item">Item 4</div>
+            <div class="item">Item 5</div>
+            <div class="item">Item 6</div>
+        </div>
+
+        <style>
+            .flex-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                /* Distribute space between items */
+            }
+
+            .item {
+                flex: 1 1 calc(33.33% - 10px);
+                /* 3 items per row, with space between */
+                margin: 5px 0;
+                /* Vertical spacing between rows */
+                text-align: center;
+                background-color: #f0f0f0;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+            }
+        </style>
+
+    </div>
+
+</body>
+
+</html>
