@@ -9,7 +9,7 @@ from .funcs import mail, send_confirmation_email, fulfill_order
 from dotenv import load_dotenv
 from .admin.route import admin
 from itsdangerous import URLSafeTimedSerializer
-
+from sqlalchemy import func
 
 import pandas as pd
 import random
@@ -47,7 +47,12 @@ login_manager.init_app(app)
 
 with app.app_context():
 	db.create_all()
- 
+
+def gen_user_id():
+    max_id = db.session.query(func.max(User.id)).scalar()
+    if max_id is None:
+        return 1  # Trường hợp chưa có người dùng nào, id sẽ bắt đầu từ 1
+    return max_id + 1
 @app.context_processor
 def inject_now():
     return{'now':datetime.now()}
@@ -94,7 +99,8 @@ def register():
 		if user:
 			flash(f"User with email {user.email} already exists!!<br> <a href={url_for('login')}>Login now!</a>", "error")
 			return redirect(url_for('register'))
-		new_user = User(name=form.name.data,
+		new_id = gen_user_id()
+		new_user = User(id=new_id,name=form.name.data,
 						email=form.email.data,
 						password=generate_password_hash(
 									form.password.data,

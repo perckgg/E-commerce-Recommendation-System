@@ -5,7 +5,64 @@
 {% endblock %}
 
 {% block content %}
-	<h3 class="text-center"> Log in to Flask-O-shop </h3>
+	<style>
+		 .forms {
+            width: 350px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+		.forms input[type="text"],
+        .forms input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        /* Hiệu ứng khi ô input được focus */
+        .forms input[type="text"]:focus,
+        .forms input[type="password"]:focus {
+            border-color: #0073e6;
+            box-shadow: 0 0 3px #0073e6;
+        }
+
+        .forms button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: pink; /* Change to pink */
+            border: none; /* Remove the border */
+            border-radius: 3px;
+            color: #111;
+            font-weight: bold; /* Make text bold */
+            cursor: pointer;
+            text-align: center;
+            font-size: 1em;
+        }
+        .text-center {
+            text-align: center;
+            font-size: 1em;
+            margin-bottom: 1em;
+        }
+
+        .flash-error {
+            color: red;
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+	</style>
+	<h3 class="text-center"> SIGN IN </h3>
 	<hr>
 	{% with msgs =  get_flashed_messages(with_categories=True) %}
 		{% for c, msg in msgs %}
@@ -18,6 +75,24 @@
 		{% endfor %}
 	{% endwith %}
 	<div class="forms">
-		{{ wtf.quick_form(form) }}
-	</div>
+        <form method="POST" action="login">
+            {{ form.hidden_tag() }}
+            
+            <div>
+                {{ form.email.label }}
+                {{ form.email(size=32, class_="form-control") }}
+            </div>
+
+            <div>
+                {{ form.password.label }}
+                {{ form.password(size=32, class_="form-control") }}
+            </div>
+
+            <div>
+                <button type="submit">Log In</button>
+            </div>
+			<p>By continuing, you agree to Amazon's <a href="#">Conditions of Use</a> and <a href="#">Privacy Notice</a>.</p>
+        	<a href="#">Need help?</a>
+        </form>
+    </div>
 {% endblock %}

@@ -1,10 +1,11 @@
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+
 import datetime
 db = SQLAlchemy()
 class User(UserMixin,db.Model):
     __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True,autoincrement = True)
     name = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(50), nullable=False)
     phone = db.Column(db.String(50), nullable=False)
@@ -23,6 +24,8 @@ class User(UserMixin,db.Model):
         item_to_remove = Cart.query.filter_by(itemid=itemid, uid=self.id, quantity=quantity).first()
         db.session.delete(item_to_remove)
         db.session.commit()
+    def get_id(self):
+         return super().get_id()
 
 class Item(db.Model):
     __tablename__ = "items"
@@ -72,3 +75,4 @@ class Commnent(db.Model):
     product = db.relationship('Item', backref=db.backref('comments', lazy=True))
     def __repr__(self):
         return f"<Comment {self.content[:20]} by User {self.user_id}>"
+    
