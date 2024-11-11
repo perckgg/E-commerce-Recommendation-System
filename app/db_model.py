@@ -63,12 +63,12 @@ class Ordered_item(db.Model):
   
 class Commnent(db.Model):
     __tablename__ = "comment"
-    id = db.Column(db.Interger,primary_key = True)
+    id = db.Column(db.Integer,primary_key = True)
     content = db.Column(db.Text, nullable = False)
-    create_at = db.Column(db.Datetime,default = datetime.datetime.now())
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    create_at = db.Column(db.DateTime,default = datetime.datetime.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('comments', lazy=True))
-    product = db.relationship('Product', backref=db.backref('comments', lazy=True))
+    product = db.relationship('Item', backref=db.backref('comments', lazy=True))
     def __repr__(self):
         return f"<Comment {self.content[:20]} by User {self.user_id}>"

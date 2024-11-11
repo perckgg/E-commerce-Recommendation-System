@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Header with Sidebar</title>
+    <style>
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Header styling */
+        .header {
+            background-color: #00331a;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            color: white;
+        }
+
+        /* Logo */
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        /* Delivery Location */
+        .location {
+            font-size: 0.9rem;
+            margin-right: 20px;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar select,
+        .search-bar input {
+            padding: 8px;
+            border: none;
+            outline: none;
+        }
+
+        .search-bar select {
+            background-color: #e6e6e6;
+            color: black;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding-left: 10px;
+        }
+
+        .search-bar button {
+            background-color: #c00073;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Menu Links */
+        .menu-links {
+            display: flex;
+            gap: 20px;
+            margin-left: 20px;
+        }
+
+        .menu-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        /* Cart Icon */
+        .cart {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            font-size: 1.2rem;
+        }
+
+        .cart .count {
+            color: #c00073;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #00331a;
+            color: white;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            padding-top: 20px;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar .close-btn {
+            font-size: 1.5rem;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .sidebar h2 {
+            margin-left: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px 20px;
+            cursor: pointer;
+        }
+
+        .sidebar ul li:hover {
+            background-color: #004d26;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">Amazon</div>
+        <div class="location">Deliver to Vietnam</div>
+        <div class="search-bar">
+            <select id="category-select">
+                <option value="all" onclick="toggleSidebar()">All</option>
+            </select>
+            <input type="text" placeholder="Search Amazon">
+            <button>🔍</button>
+        </div>
+        <div class="menu-links">
+            <a href="#">Today's Deals</a>
+            <a href="#">Customer Service</a>
+            <a href="#">Registry</a>
+            <a href="#">Gift Cards</a>
+            <a href="#">Sell</a>
+        </div>
+        <div class="cart">
+            Cart <span class="count">(0)</span>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <span class="close-btn" onclick="toggleSidebar()">X</span>
+        <h2>Shop by Category</h2>
+        <ul>
+            <li>Electronics</li>
+            <li>Books</li>
+            <li>Clothing</li>
+            <li>Home & Kitchen</li>
+            <li>Beauty & Personal Care</li>
+            <li>Sports & Outdoors</li>
+            <li>Orders</li>
+            <li>Account Settings</li>
+        </ul>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <script>
+        // Function to toggle sidebar and overlay
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+        }
+        
+        // Close sidebar if user clicks anywhere on the screen or on 'X' button
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const categorySelect = document.getElementById('category-select');
+
+            if (!sidebar.contains(e.target) && !categorySelect.contains(e.target)) {
+                sidebar.classList.remove('active');
+                overlay.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
