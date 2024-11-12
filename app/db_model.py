@@ -16,7 +16,9 @@ class User(UserMixin,db.Model):
     orders = db.relationship("Order", backref='customer')
     
     def add_to_cart(self, itemid, quantity):
-        item_to_add = Cart(itemid=itemid, uid=self.id, quantity=quantity)
+        max_id = db.session.query(db.func.max(Cart.id)).scalar()
+        new_id = max_id + 1 if max_id is not None else 1
+        item_to_add = Cart(id=new_id,itemid=itemid, uid=self.id, quantity=quantity)
         db.session.add(item_to_add)
         db.session.commit()
 
@@ -44,7 +46,7 @@ class Item(db.Model):
 
 class Cart(db.Model):
 	__tablename__ = "cart"
-	id = db.Column(db.Integer, primary_key=True)
+	id = db.Column(db.Integer, primary_key=True,autoincrement=True)
 	uid = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 	itemid = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
 	quantity = db.Column(db.Integer, nullable=False, default=1)
