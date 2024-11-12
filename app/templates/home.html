@@ -19,18 +19,9 @@ Home - Flask-O-shop
 	{% if search %}
 	<h3>Search results for "{{ query }}":</h3>
 	{% else %}
-	<div style="display:flex; flex-direction:row;">
+	<div style="display:flex; align-items: flex-start;">
 		<!-- Sidebar -->
 		<style>
-			.sidebar {
-				width: 250px;
-				padding: 20px;
-				background-color: #ffffff;
-				border-radius: 8px;
-				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-				margin: 0px 20px;
-			}
-
 			.sidebar h2 {
 				font-size: 18px;
 				color: #333;
@@ -69,12 +60,56 @@ Home - Flask-O-shop
 				font-size: 16px;
 				color: #555;
 			}
+
+			.sidebar.fixed {
+				position: fixed;
+				top: 10px;
+				/* Adjusted to add a margin from the top */
+			}
 		</style>
-		<div class="sidebar">
+		<script>
+			window.addEventListener('scroll', function () {
+				const navbar = document.querySelector('.navbar'); // Select your navbar element
+				const sidebar = document.querySelector('.sidebar'); // Select your sidebar element
+
+				const navbarHeight = navbar.offsetHeight; // Get the navbar height
+				const scrollPosition = window.scrollY; // Get the current scroll position
+
+				// Add or remove 'fixed' class based on scroll position
+				if (scrollPosition > navbarHeight) {
+					sidebar.classList.add('fixed');
+				} else {
+					sidebar.classList.remove('fixed');
+				}
+			});
+		</script>
+		<script>
+			// Function to fetch the image URL from the API and set it as the src of the img tag
+			async function setImageSrc() {
+				try {
+					// Replace 'your-api-endpoint' with your actual API URL
+					const response = await fetch('https://pixabay.com/api/?key=47027767-3ad9a6c19ac6036a4d30f5206&q=apple&image_type=photo');
+					const data = await response.json();
+
+					// Assuming 'X' is the attribute containing the image URL in the JSON response
+					const imageUrl = data.hits[0].previewURL;
+					console.log(imageUrl)
+					// Set the image URL to the img tag's src attribute
+					document.getElementById('category1').src = imageUrl;
+				} catch (error) {
+					console.error('Error fetching image URL:', error);
+				}
+			}
+
+			// Call the function to set the image src
+			setImageSrc();
+		</script>
+		<div class="sidebar"
+			style="width: 250px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);margin: 0px 20px; position: sticky;">
 			<h2>Category</h2>
 			<ul class="category-list">
 				<li class="category-item">
-					<img src="static/img/img_1.png" alt="Book Icon" class="icon">
+					<img id="category1" alt="Book Icon" class="icon" style="border-radius: 5px;">
 					<span>Nhà Sách Tiki</span>
 				</li>
 				<li class="category-item">
@@ -118,6 +153,7 @@ Home - Flask-O-shop
 			<br>
 			<div class="items">
 				{% for item in items[::-1] %}
+
 				<a href="{{ url_for('item', id=item.id) }}">
 					<div class="item">
 						<div class="item-wrapper">

@@ -14,6 +14,7 @@
 
   <title>{% block title %} {% endblock %}</title>
 </head>
+<script src="https://kit.fontawesome.com/1f303d27a0.js" crossorigin="anonymous"></script>
 
 <body>
 
@@ -25,10 +26,29 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <form class="form-inline my-2 my-lg-0 ml-auto" action="{{ url_for('search') }}">
-        <input class="form-control mr-sm-2" type="search" name="query" placeholder="Search" size="40" required>
-        <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">
-      </form>
+      <div class="search-box" style="display: flex; justify-content: center; flex-grow: 1;">
+        <style>
+          label {
+            display: flex;
+            height: 35px;
+            background-color: aqua;
+            width: 35px;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0 15px 15px 0;
+          }
+
+          label:hover {
+            cursor: pointer;
+            background-color: #3399ff;
+          }
+        </style>
+        <input type="text" placeholder="Search for ..."
+          style="padding-left:5px;height: 35px; border-radius: 15px 0 0 15px; background-color: white;outline:none; border: none; max-width: 300px; width: 80%;"></input>
+        <label for="" class="icon">
+          <i class="fas fa-search"></i>
+        </label>
+      </div>
       <ul class="navbar-nav ml-auto">
         {% if not current_user.is_authenticated %}
         <li class="nav-item">
