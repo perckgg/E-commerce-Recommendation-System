@@ -1,72 +1,173 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Home - Flask-O-shop
+Home - Flask-O-shop
 {% endblock %}
 
 {% block content %}
-	{% with msgs =  get_flashed_messages(with_categories=True) %}
-	{% for c, msg in msgs %}
-		{% if c == 'error' %}
-			<div class="flash-error">
-		{% else %}
-			<div class="success">
+{% with msgs = get_flashed_messages(with_categories=True) %}
+{% for c, msg in msgs %}
+{% if c == 'error' %}
+<div class="flash-error">
+	{% else %}
+	<div class="success">
 		{% endif %}
-			{{ msg | safe}}</div><br>
+		{{ msg | safe}}</div><br>
 	{% endfor %}
 	{% endwith %}
 
 	{% if search %}
 	<h3>Search results for "{{ query }}":</h3>
 	{% else %}
-	<h3>New Arrivals</h3>
-	<br>
-	<div class="items">
-	{% for item in items[::-1] %}
-	<a href="{{ url_for('item', id=item.id) }}">
-		<div class="item">
-			<div class="item-wrapper">
-				<div class="img-wrapper">
-					<img src="{{ item.image }}" class="pic">
-				</div>
-				{{ item.name }}
-				<span class="right-item">${{ item.price }}</span><br>
-					<i class="fa fa-star checked"></i>
-					<i class="fa fa-star checked"></i>
-					<i class="fa fa-star checked"></i>
-					<i class="fa fa-star checked"></i>
-					<i class="fa fa-star checked"></i>
-					<span class="text-muted" >({{ range(1, 51) | random }})</span>
-			</div>
+	<div style="display:flex; flex-direction:row; width: 100%;">
+		<!-- Sidebar -->
+		<style>
+			.sidebar {
+				position: relative;
+				width: 250px;
+				padding: 20px;
+				background-color: #ffffff;
+				border-radius: 8px;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+				margin: 20px;
+			}
+
+			.sidebar h2 {
+				font-size: 18px;
+				color: #333;
+				margin-bottom: 20px;
+			}
+
+			.category-list {
+				width: 100%;
+				padding: 0px;
+			}
+
+			.category-item {
+				width: 100%;
+				display: flex;
+				align-items: center;
+				padding: 10px 5px;
+				transition: background-color 0.3s;
+				border-radius: 10px;
+			}
+
+			.category-item:last-child {
+				border-bottom: none;
+			}
+
+			.category-item:hover {
+				background-color: #f5f5f5;
+			}
+
+			.category-item .icon {
+				width: 30px;
+				height: 30px;
+				margin-right: 10px;
+			}
+
+			.category-item span {
+				font-size: 16px;
+				color: #555;
+			}
+		</style>
+		<div class="sidebar">
+			<h2>Category</h2>
+			<ul class="category-list">
+				<li class="category-item">
+					<img src="static/img/img_1.png" alt="Book Icon" class="icon">
+					<span>Nhà Sách Tiki</span>
+				</li>
+				<li class="category-item">
+					<img src="path/to/pot-icon.png" alt="Pot Icon" class="icon">
+					<span>Nhà Cửa - Đời Sống</span>
+				</li>
+				<li class="category-item">
+					<img src="path/to/phone-icon.png" alt="Phone Icon" class="icon">
+					<span>Điện Thoại - Máy Tính Bảng</span>
+				</li>
+				<li class="category-item">
+					<img src="path/to/toy-icon.png" alt="Toy Icon" class="icon">
+					<span>Đồ Chơi - Mẹ & Bé</span>
+				</li>
+				<li class="category-item">
+					<img src="path/to/headphone-icon.png" alt="Headphone Icon" class="icon">
+					<span>Thiết Bị Số - Phụ Kiện Số</span>
+				</li>
+				<li class="category-item">
+					<img src="path/to/appliance-icon.png" alt="Appliance Icon" class="icon">
+					<span>Điện Gia Dụng</span>
+				</li>
+				<li class="category-item">
+					<img src="path/to/beauty-icon.png" alt="Beauty Icon" class="icon">
+					<span>Làm Đẹp - Sức Khỏe</span>
+				</li>
+				<li class="category-item">
+					<img src="path/to/bike-icon.png" alt="Bike Icon" class="icon">
+					<span>Ô Tô - Xe Máy - Xe Đạp</span>
+				</li>
+				<li class="category-item">
+					<img src="path/to/fashion-icon.png" alt="Fashion Icon" class="icon">
+					<span>Thời trang nữ</span>
+				</li>
+			</ul>
 		</div>
-	</a>
-	{% endfor %}
+
+		<div class="itemscontainer" style="flex-grow: 1;">
+			<h3>New Arrivals</h3>
+			<br>
+			<div class="items">
+				{% for item in items[::-1] %}
+				<a href="{{ url_for('item', id=item.id) }}">
+					<div class="item">
+						<div class="item-wrapper">
+							<div class="img-wrapper">
+								<img src="{{ item.image }}" class="pic">
+							</div>
+							{{ item.name }}
+							<span class="right-item">${{ item.price }}</span><br>
+							<i class="fa fa-star checked"></i>
+							<i class="fa fa-star checked"></i>
+							<i class="fa fa-star checked"></i>
+							<i class="fa fa-star checked"></i>
+							<i class="fa fa-star checked"></i>
+							<span class="text-muted">({{ range(1, 51) | random }})</span>
+						</div>
+					</div>
+				</a>
+				{% endfor %}
+			</div>
+
+			<br><br>
+			<h3>Most Popular</h3>
+			{% endif %}
+			<br>
+			<div class="items">
+				{% for item in items %}
+				<a href="{{ url_for('item', id=item.id) }}">
+					<div class="item">
+						<div class="item-wrapper">
+							<div class="img-wrapper">
+								<img src="{{ item.image }}" class="pic">
+							</div>
+							{{ item.name }}
+							<span class="right-item">${{ item.price }}</span><br>
+							<i class="fa fa-star checked"></i>
+							<i class="fa fa-star checked"></i>
+							<i class="fa fa-star checked"></i>
+							<i class="fa fa-star checked"></i>
+							<i class="fa fa-star checked"></i>
+							<span class="text-muted">({{ range(1, 51) | random }})</span>
+						</div>
+					</div>
+				</a>
+				{% endfor %}
+			</div>
+
+		</div>
 	</div>
 
-	<br><br><h3>Most Popular</h3>
-	{% endif %}
-	<br>
-	<div class="items">
-	{% for item in items %}
-	<a href="{{ url_for('item', id=item.id) }}">
-		<div class="item">
-			<div class="item-wrapper">
-				<div class="img-wrapper">
-					<img src="{{ item.image }}" class="pic">
-				</div>
-				{{ item.name }}
-				<span class="right-item">${{ item.price }}</span><br>
-					<i class="fa fa-star checked"></i>
-					<i class="fa fa-star checked"></i>
-					<i class="fa fa-star checked"></i>
-					<i class="fa fa-star checked"></i>
-					<i class="fa fa-star checked"></i>
-					<span class="text-muted" >({{ range(1, 51) | random }})</span>
-			</div>
-		</div>
-	</a>
-	{% endfor %}
-	</div>
+
 
 	{% if not items %}
 	<div class="flash-error">
@@ -74,4 +175,4 @@
 		<a href="{{ url_for('home') }}">Discover new items</a>
 	</div>
 	{% endif %}
-{% endblock %}
+	{% endblock %}
