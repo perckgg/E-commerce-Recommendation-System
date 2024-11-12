@@ -5,19 +5,118 @@
 {% endblock %}
 
 {% block content %}
-	<h3 class="text-center"> Register to Flask-O-shop </h3>
-	<hr>
-	{% with msgs =  get_flashed_messages(with_categories=True) %}
-		{% for c, msg in msgs %}
-			{% if c == 'error' %}
-				<div class="flash-error">
-			{% else %}
-				<div class="success">
-			{% endif %}
-				{{ msg | safe }}</div><br>
-		{% endfor %}
-	{% endwith %}
-	<div class="forms">
-		{{ wtf.quick_form(form) }}
+	<style>
+		.register-container {
+            background-color: white;
+            width: 350px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+            justify-content: center;
+        }
+		.ecom-logo img{
+			width: 120px;
+		}
+		.register-container h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+		.register-container label {
+            display: block;
+            font-size: 14px;
+            text-align: left;
+            margin-bottom: 5px;
+            color: #333;
+        }
+		.register-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+            outline: none; /* Xóa viền outline mặc định */
+        }
+
+        /* Thêm hiệu ứng khi input được focus */
+        .register-container input[type="text"]:focus {
+            border-color: #0073e6; /* Màu viền xanh khi nhấp vào ô text */
+            box-shadow: 0 0 3px #0073e6; /* Tạo hiệu ứng bóng mờ xanh nhạt xung quanh */
+        }
+
+        .register-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FF728F;
+            border: 1px solid #a78a40;
+            border-radius: 3px;
+            color: #111;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+	</style>
+	<div class = "register-control" style = "display: flex; height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center;">
+		<div class = "register-container">
+			<div class = "ecom-logo">
+				<img src = "../static/img/logo.png" alt = "Ecom Logo">
+			</div>
+			<h3 class="text-center"> Register to Ecom-Olist </h3>
+			<hr>
+			{% with msgs =  get_flashed_messages(with_categories=True) %}
+				{% for c, msg in msgs %}
+					{% if c == 'error' %}
+						<div class="flash-error">
+					{% else %}
+						<div class="success">
+					{% endif %}
+						{{ msg | safe }}</div><br>
+				{% endfor %}
+			{% endwith %}
+			<form method ="POST" action = "register" >
+				{{ form.hidden_tag() }}
+            
+            <div>
+                {{ form.name.label }}
+                {{ form.name(size=32, class_="form-control") }}
+            </div>
+
+            <div>
+                {{ form.phone.label }}
+                {{ form.phone(size=32, class_="form-control") }}
+            </div>
+			<div>
+                {{ form.email.label }}
+                {{ form.email(size=32, class_="form-control") }}
+            </div>
+
+			<div>
+                {{ form.password.label }}
+                {{ form.password(size=32, class_="form-control") }}
+            </div>
+			<div>
+                {{ form.confirm.label }}
+                {{ form.confirm(size=32, class_="form-control") }}
+            </div>
+             <br>   
+            <div>
+                <button type="submit">Register</button>
+            </div>
+			</form>
+		</div>
+		
+	
 	</div>
+	
+	
+<!-- <div class="forms">
+	{{ wtf.quick_form(form) }}
+</div> -->
 {% endblock %}
