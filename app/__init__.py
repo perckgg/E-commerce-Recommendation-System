@@ -1,7 +1,8 @@
 import os, stripe, json
-from flask import Flask, request, render_template,redirect, url_for, flash, request, abort
+from flask import Flask, request, render_template,redirect, url_for, flash, request, abort,session
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
+from flask_dance.contrib.google import make_google_blueprint, google
 from werkzeug.security import generate_password_hash, check_password_hash
 from .form import LoginForm, RegisterForm
 from .db_model import  db,User, Item
@@ -24,13 +25,18 @@ import uuid
 trending_products = pd.read_csv("app/models/trending_products.csv")
 train_data = pd.read_csv("app/models/clean_data.csv")
 
-# database configuration---------------------------------------
-
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 load_dotenv()
 app = Flask(__name__)
 
 app.register_blueprint(admin)
-
+google_bp = make_google_blueprint(
+	client_id=os.environ.get('GOOGLE_CLIENT_ID'),
+	client_secret=os.environ.get('GOOGLE_CLIENT_SECRET'),
+ 	redirect_url="callback",
+   	 scope=["openid", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"]
+)
+app.register_blueprint(google_bp, url_prefix="/login")
 app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -40,6 +46,7 @@ app.config['MAIL_SERVER'] = "smtp.googlemail.com"
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_PORT'] = 587
 stripe.api_key = os.environ["STRIPE_PRIVATE"]
+
 # db = SQLAlchemy(app)
 Bootstrap(app)
 db.init_app(app)
@@ -84,6 +91,37 @@ def login():
 			flash("Email and password incorrect!!", "error")
 			return redirect(url_for('login'))
 	return render_template("login.html", form=form)
+@app.route("/login/google/callback")
+def google_login():
+    # Kiểm tra xem người dùng có được xác thực trên Google không
+    if not google.authorized:
+        return redirect(url_for("google.login"))
+
+    # Lấy thông tin người dùng từ Google
+    resp = google.get("/oauth2/v2/userinfo")
+    if resp.ok:
+        user_info = resp.json()
+        email = user_info["email"]
+
+        # Kiểm tra xem người dùng đã tồn tại trong CSDL hay chưa
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            new_id = gen_user_id()
+            user = User(id=new_id,
+                name=user_info["name"],
+                email=email,
+                email_confirmed=True  # Đánh dấu là đã xác thực email
+            )
+            db.session.add(user)
+            db.session.commit()
+
+        # Đăng nhập người dùng với Flask-Login
+        login_user(user)
+        flash("Đăng nhập thành công bằng Google!", "success")
+        return redirect(url_for("home"))
+    else:
+        flash("Đã xảy ra lỗi khi đăng nhập với Google.", "error")
+        return redirect(url_for("login"))
 @app.route('/search')
 def search():
 	query = request.args['query']

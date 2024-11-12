@@ -118,3 +118,11 @@
 -- INSERT INTO "users" VALUES(2,'test','test','1','pbkdf2:sha256:260000$HArNj0BJ$3010254ed22cace4876325b1d51681ca1330e366c9ed819ffa3afe4d4c452f1a',False,True);
 -- COMMIT;
 -- ROLLBACK;
+
+alter table users
+alter column password
+drop not null
+
+alter table users
+alter column phone
+drop not null
