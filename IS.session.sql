@@ -1,2 +1,2 @@
 SELECT *
-from items;
+FROM users;
