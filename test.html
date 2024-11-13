@@ -1,150 +1,354 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amazon Login</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            min-height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            font-family: "Montserrat", sans-serif;
         }
 
-        .login-container {
-            background-color: white;
-            width: 350px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            text-align: center;
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row-reverse;
+            padding: 2em 2em 2em 5em;
+            gap: 10px;
+            border-top-right-radius: 75px;
+            border-bottom-right-radius: 75px;
+            border: none;
+            position: relative;
+            background: #2b2b2b;
+            box-shadow: 0 1px 1px hsl(0deg 0% 0%/0.075), 0 2px 2px hsl(0deg 0% 0%/0.075),
+                0 4px 4px hsl(0deg 0% 0%/0.075), 0 8px 8px hsl(0deg 0% 0%/0.075),
+                0 16px 16px hsl(0deg 0% 0%/0.075);
+
+            .rating-value {
+                position: absolute;
+                top: -10px;
+                left: -69px;
+                border-radius: 50%;
+                height: 138px;
+                width: 138px;
+                background: #ffbb00;
+                box-shadow: 0 1px 1px hsl(0deg 0% 0%/0.075), 0 2px 2px hsl(0deg 0% 0%/0.075),
+                    0 4px 4px hsl(0deg 0% 0%/0.075), 0 8px 8px hsl(0deg 0% 0%/0.075),
+                    0 16px 16px hsl(0deg 0% 0%/0.075), inset 0 0 10px #f7db5e, 0 0 10px #f7db5e;
+
+                &:before {
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    margin: auto;
+                    text-align: center;
+                    line-height: 138px;
+                    font-size: 2.5em;
+                    color: #2b2b2b;
+                    content: "0";
+                    transform-origin: "center center";
+                    transition: all 0.25s ease 0s;
+                }
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    height: 138px;
+                    width: 138px;
+                    top: -1px;
+                    left: -1px;
+
+                    height: 170px;
+                    width: 170px;
+                    top: -16px;
+                    left: -16px;
+
+                    margin: auto;
+                    border: 1px solid #ffbb00;
+                    border-radius: 50%;
+                    transition: all 0.4s ease-in;
+                }
+            }
+
+            input {
+                display: none;
+            }
+
+            label {
+                height: 50px;
+                width: 50px;
+                transform-origin: "center center";
+
+                svg {
+                    transition: transform 0.4s ease-in-out;
+                    opacity: 0.5;
+                }
+
+                &:hover {
+                    svg {
+                        transform: scale(1.25) rotate(10deg);
+                    }
+                }
+            }
         }
 
-        .amazon-logo img {
-            width: 140px;
-            margin-bottom: 10px;
+        input:checked~label svg {
+            opacity: 1;
+            transform: scale(1.25) rotate(10deg);
         }
 
-        .login-container h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #333;
+        label:hover {
+
+            svg,
+            ~label svg {
+                opacity: 1;
+                transform: scale(1.25) rotate(10deg);
+            }
         }
 
-        .login-container label {
-            display: block;
-            font-size: 14px;
-            text-align: left;
-            margin-bottom: 5px;
-            color: #333;
+        input:checked {
+            +label:hover svg {
+                opacity: 1;
+            }
+
+            ~label:hover {
+
+                svg,
+                ~label svg {
+                    opacity: 1;
+                }
+            }
         }
 
-        .login-container input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            box-sizing: border-box;
-            outline: none; /* Xóa viền outline mặc định */
+        label:hover~input:checked~label svg {
+            opacity: 1;
         }
 
-        /* Thêm hiệu ứng khi input được focus */
-        .login-container input[type="text"]:focus {
-            border-color: #0073e6; /* Màu viền xanh khi nhấp vào ô text */
-            box-shadow: 0 0 3px #0073e6; /* Tạo hiệu ứng bóng mờ xanh nhạt xung quanh */
+        #rate1:checked~.rating-value:before {
+            content: "1";
+            font-size: 2.75em;
         }
 
-        .login-container button {
-            width: 100%;
-            padding: 10px;
-            background-color: #f0c14b;
-            border: 1px solid #a88734;
-            border-radius: 3px;
-            color: #111;
-            font-weight: bold;
-            cursor: pointer;
+        label[for="rate1"]:hover~.rating-value:before {
+            content: "1" !important;
+            font-size: 2.75em !important;
         }
 
-        .login-container p {
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
+        #rate2:checked~.rating-value:before {
+            content: "2";
+            font-size: 3em;
         }
 
-        .login-container a {
-            color: #0066c0;
-            text-decoration: none;
+        label[for="rate2"]:hover~.rating-value:before {
+            content: "2" !important;
+            font-size: 3em !important;
         }
 
-        .login-container .divider {
-            margin: 15px 0;
-            border-bottom: 1px solid #ddd;
+        #rate3:checked~.rating-value:before {
+            content: "3";
+            font-size: 3.25em;
         }
 
-        .create-account {
-            margin-top: 20px;
+        label[for="rate3"]:hover~.rating-value:before {
+            content: "3" !important;
+            font-size: 3.25em !important;
         }
 
-        .create-account button {
-            width: 100%;
-            padding: 10px;
-            background-color: #e7e9ec;
-            border: 1px solid #888;
-            border-radius: 3px;
-            color: #111;
-            cursor: pointer;
+        #rate4:checked~.rating-value:before {
+            content: "4";
+            font-size: 3.5em;
         }
 
-        /* Footer links */
-        .footer-links {
-            font-size: 12px;
-            color: #666;
-            margin-top: 20px;
-            text-align: center;
+        label[for="rate4"]:hover~.rating-value:before {
+            content: "4" !important;
+            font-size: 3.5em !important;
         }
 
-        .footer-links a {
-            color: #0066c0;
-            text-decoration: none;
-            margin: 0 10px;
+        #rate5:checked~.rating-value:before {
+            content: "5";
+            font-size: 3.75em;
+        }
+
+        @keyframes pulse {
+            0% {
+                height: 138px;
+                width: 138px;
+                top: -1px;
+                left: -1px;
+                opacity: 1;
+            }
+
+            100% {
+                height: 170px;
+                width: 170px;
+                top: -16px;
+                left: -16px;
+                opacity: 0;
+            }
+        }
+
+        #rate5:checked~.rating-value:after {
+            animation: pulse 0.4s ease-out 1;
+        }
+
+        label[for="rate5"]:hover~.rating-value:before {
+            content: "5" !important;
+            font-size: 3.75em !important;
         }
     </style>
 </head>
+
 <body>
 
-<div class="login-container">
-    <div class="amazon-logo">
-        <img src="/app/static/img/logo.png" alt="Amazon Logo">
-    </div>
-    <h2>Sign in</h2>
-    <form>
-        <label for="email">Email or mobile phone number</label>
-        <input type="text" id="email" placeholder="Enter your email or phone number">
-        <button type="submit">Continue</button>
-        <p>By continuing, you agree to Amazon's <a href="#">Conditions of Use</a> and <a href="#">Privacy Notice</a>.</p>
-        <a href="#">Need help?</a>
-    </form>
-    <div class="divider"></div>
-    <p><strong>Buying for work?</strong> <a href="#">Shop on Amazon Business</a></p>
-    <div class="create-account">
-        <p>New to Amazon?</p>
-        <button><i class="fa-solid fa-magnifying-glass"></i>
+    <fieldset class="rating-container">
+        <input type="radio" name="rating" id="rate5">
+        <label for="rate5">
+            <svg id="Object" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1122 1122">
+                <defs>
+                    <style>
+                        .cls-1 {
+                            fill: #f7db5e;
+                        }
 
-        </button>
-    </div>
-</div>
+                        .cls-2 {
+                            fill: #f3cc30;
+                        }
 
-<div class="footer-links">
-    <a href="#">Conditions of Use</a>
-    <a href="#">Privacy Notice</a>
-    <a href="#">Help</a>
-</div>
-<script src="https://kit.fontawesome.com/1f303d27a0.js" crossorigin="anonymous"></script>
+                        .cls-3 {
+                            fill: #edbd31;
+                        }
+                    </style>
+                </defs>
+                <path class="cls-2"
+                    d="m570.497,252.536l93.771,190c1.543,3.126,4.525,5.292,7.974,5.794l209.678,30.468c8.687,1.262,12.156,11.938,5.87,18.065l-151.724,147.895c-2.496,2.433-3.635,5.939-3.046,9.374l35.817,208.831c1.484,8.652-7.597,15.25-15.367,11.165l-187.542-98.596c-3.085-1.622-6.771-1.622-9.857,0l-187.542,98.596c-7.77,4.085-16.851-2.513-15.367-11.165l35.817-208.831c.589-3.436-.55-6.941-3.046-9.374l-151.724-147.895c-6.286-6.127-2.817-16.803,5.87-18.065l209.678-30.468c3.45-.501,6.432-2.668,7.974-5.794l93.771-190c3.885-7.872,15.11-7.872,18.995,0Z" />
+                <path class="cls-1"
+                    d="m561,296.423l-83.563,161.857c-4.383,8.49-12.797,14.155-22.312,15.024l-181.433,16.562,191.688,8.964c12.175.569,23.317-6.81,27.543-18.243l68.077-184.164Z" />
+                <path class="cls-3"
+                    d="m357.284,838.933l-4.121,24.03c-1.484,8.652,7.597,15.25,15.367,11.165l187.541-98.596c3.086-1.622,6.771-1.622,9.857,0l187.541,98.596c7.77,4.085,16.851-2.513,15.367-11.165l-35.817-208.831c-.589-3.435.55-6.941,3.046-9.374l151.724-147.894c6.287-6.127,2.818-16.802-5.87-18.065l-70.23-10.205c-113.59,203.853-287.527,311.181-454.405,370.34Z" />
+            </svg>
+        </label>
+        <input type="radio" name="rating" id="rate4">
+        <label for="rate4">
+            <svg id="Object" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1122 1122">
+                <defs>
+                    <style>
+                        .cls-1 {
+                            fill: #f7db5e;
+                        }
+
+                        .cls-2 {
+                            fill: #f3cc30;
+                        }
+
+                        .cls-3 {
+                            fill: #edbd31;
+                        }
+                    </style>
+                </defs>
+                <path class="cls-2"
+                    d="m570.497,252.536l93.771,190c1.543,3.126,4.525,5.292,7.974,5.794l209.678,30.468c8.687,1.262,12.156,11.938,5.87,18.065l-151.724,147.895c-2.496,2.433-3.635,5.939-3.046,9.374l35.817,208.831c1.484,8.652-7.597,15.25-15.367,11.165l-187.542-98.596c-3.085-1.622-6.771-1.622-9.857,0l-187.542,98.596c-7.77,4.085-16.851-2.513-15.367-11.165l35.817-208.831c.589-3.436-.55-6.941-3.046-9.374l-151.724-147.895c-6.286-6.127-2.817-16.803,5.87-18.065l209.678-30.468c3.45-.501,6.432-2.668,7.974-5.794l93.771-190c3.885-7.872,15.11-7.872,18.995,0Z" />
+                <path class="cls-1"
+                    d="m561,296.423l-83.563,161.857c-4.383,8.49-12.797,14.155-22.312,15.024l-181.433,16.562,191.688,8.964c12.175.569,23.317-6.81,27.543-18.243l68.077-184.164Z" />
+                <path class="cls-3"
+                    d="m357.284,838.933l-4.121,24.03c-1.484,8.652,7.597,15.25,15.367,11.165l187.541-98.596c3.086-1.622,6.771-1.622,9.857,0l187.541,98.596c7.77,4.085,16.851-2.513,15.367-11.165l-35.817-208.831c-.589-3.435.55-6.941,3.046-9.374l151.724-147.894c6.287-6.127,2.818-16.802-5.87-18.065l-70.23-10.205c-113.59,203.853-287.527,311.181-454.405,370.34Z" />
+            </svg>
+        </label>
+        <input type="radio" name="rating" id="rate3">
+        <label for="rate3">
+            <svg id="Object" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1122 1122">
+                <defs>
+                    <style>
+                        .cls-1 {
+                            fill: #f7db5e;
+                        }
+
+                        .cls-2 {
+                            fill: #f3cc30;
+                        }
+
+                        .cls-3 {
+                            fill: #edbd31;
+                        }
+                    </style>
+                </defs>
+                <path class="cls-2"
+                    d="m570.497,252.536l93.771,190c1.543,3.126,4.525,5.292,7.974,5.794l209.678,30.468c8.687,1.262,12.156,11.938,5.87,18.065l-151.724,147.895c-2.496,2.433-3.635,5.939-3.046,9.374l35.817,208.831c1.484,8.652-7.597,15.25-15.367,11.165l-187.542-98.596c-3.085-1.622-6.771-1.622-9.857,0l-187.542,98.596c-7.77,4.085-16.851-2.513-15.367-11.165l35.817-208.831c.589-3.436-.55-6.941-3.046-9.374l-151.724-147.895c-6.286-6.127-2.817-16.803,5.87-18.065l209.678-30.468c3.45-.501,6.432-2.668,7.974-5.794l93.771-190c3.885-7.872,15.11-7.872,18.995,0Z" />
+                <path class="cls-1"
+                    d="m561,296.423l-83.563,161.857c-4.383,8.49-12.797,14.155-22.312,15.024l-181.433,16.562,191.688,8.964c12.175.569,23.317-6.81,27.543-18.243l68.077-184.164Z" />
+                <path class="cls-3"
+                    d="m357.284,838.933l-4.121,24.03c-1.484,8.652,7.597,15.25,15.367,11.165l187.541-98.596c3.086-1.622,6.771-1.622,9.857,0l187.541,98.596c7.77,4.085,16.851-2.513,15.367-11.165l-35.817-208.831c-.589-3.435.55-6.941,3.046-9.374l151.724-147.894c6.287-6.127,2.818-16.802-5.87-18.065l-70.23-10.205c-113.59,203.853-287.527,311.181-454.405,370.34Z" />
+            </svg>
+        </label>
+        <input type="radio" name="rating" id="rate2">
+        <label for="rate2">
+            <svg id="Object" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1122 1122">
+                <defs>
+                    <style>
+                        .cls-1 {
+                            fill: #f7db5e;
+                        }
+
+                        .cls-2 {
+                            fill: #f3cc30;
+                        }
+
+                        .cls-3 {
+                            fill: #edbd31;
+                        }
+                    </style>
+                </defs>
+                <path class="cls-2"
+                    d="m570.497,252.536l93.771,190c1.543,3.126,4.525,5.292,7.974,5.794l209.678,30.468c8.687,1.262,12.156,11.938,5.87,18.065l-151.724,147.895c-2.496,2.433-3.635,5.939-3.046,9.374l35.817,208.831c1.484,8.652-7.597,15.25-15.367,11.165l-187.542-98.596c-3.085-1.622-6.771-1.622-9.857,0l-187.542,98.596c-7.77,4.085-16.851-2.513-15.367-11.165l35.817-208.831c.589-3.436-.55-6.941-3.046-9.374l-151.724-147.895c-6.286-6.127-2.817-16.803,5.87-18.065l209.678-30.468c3.45-.501,6.432-2.668,7.974-5.794l93.771-190c3.885-7.872,15.11-7.872,18.995,0Z" />
+                <path class="cls-1"
+                    d="m561,296.423l-83.563,161.857c-4.383,8.49-12.797,14.155-22.312,15.024l-181.433,16.562,191.688,8.964c12.175.569,23.317-6.81,27.543-18.243l68.077-184.164Z" />
+                <path class="cls-3"
+                    d="m357.284,838.933l-4.121,24.03c-1.484,8.652,7.597,15.25,15.367,11.165l187.541-98.596c3.086-1.622,6.771-1.622,9.857,0l187.541,98.596c7.77,4.085,16.851-2.513,15.367-11.165l-35.817-208.831c-.589-3.435.55-6.941,3.046-9.374l151.724-147.894c6.287-6.127,2.818-16.802-5.87-18.065l-70.23-10.205c-113.59,203.853-287.527,311.181-454.405,370.34Z" />
+            </svg>
+        </label>
+        <input type="radio" name="rating" id="rate1">
+        <label for="rate1">
+            <svg id="Object" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1122 1122">
+                <defs>
+                    <style>
+                        .cls-1 {
+                            fill: #f7db5e;
+                        }
+
+                        .cls-2 {
+                            fill: #f3cc30;
+                        }
+
+                        .cls-3 {
+                            fill: #edbd31;
+                        }
+                    </style>
+                </defs>
+                <path class="cls-2"
+                    d="m570.497,252.536l93.771,190c1.543,3.126,4.525,5.292,7.974,5.794l209.678,30.468c8.687,1.262,12.156,11.938,5.87,18.065l-151.724,147.895c-2.496,2.433-3.635,5.939-3.046,9.374l35.817,208.831c1.484,8.652-7.597,15.25-15.367,11.165l-187.542-98.596c-3.085-1.622-6.771-1.622-9.857,0l-187.542,98.596c-7.77,4.085-16.851-2.513-15.367-11.165l35.817-208.831c.589-3.436-.55-6.941-3.046-9.374l-151.724-147.895c-6.286-6.127-2.817-16.803,5.87-18.065l209.678-30.468c3.45-.501,6.432-2.668,7.974-5.794l93.771-190c3.885-7.872,15.11-7.872,18.995,0Z" />
+                <path class="cls-1"
+                    d="m561,296.423l-83.563,161.857c-4.383,8.49-12.797,14.155-22.312,15.024l-181.433,16.562,191.688,8.964c12.175.569,23.317-6.81,27.543-18.243l68.077-184.164Z" />
+                <path class="cls-3"
+                    d="m357.284,838.933l-4.121,24.03c-1.484,8.652,7.597,15.25,15.367,11.165l187.541-98.596c3.086-1.622,6.771-1.622,9.857,0l187.541,98.596c7.77,4.085,16.851-2.513,15.367-11.165l-35.817-208.831c-.589-3.435.55-6.941,3.046-9.374l151.724-147.894c6.287-6.127,2.818-16.802-5.87-18.065l-70.23-10.205c-113.59,203.853-287.527,311.181-454.405,370.34Z" />
+            </svg>
+        </label>
+        <div class="rating-value"></div>
+    </fieldset>
+    <script src="https://kit.fontawesome.com/1f303d27a0.js" crossorigin="anonymous"></script>
 </body>
+
 </html>

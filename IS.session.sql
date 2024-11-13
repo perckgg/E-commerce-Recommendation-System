@@ -1,2 +1,2 @@
-SELECT *
-FROM users;
+ALTER TABLE users
+ALTER COLUMN password DROP not null
