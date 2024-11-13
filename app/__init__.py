@@ -6,7 +6,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Message
 from .form import LoginForm, RegisterForm,RequestResetForm,ResetPasswordForm
-from .db_model import  db,User, Item
+from .db_model import  db,User, Item,Comment
 from .funcs import mail, send_confirmation_email, fulfill_order
 from dotenv import load_dotenv
 from .admin.route import admin
@@ -216,7 +216,8 @@ def remove(id, quantity):
 @app.route('/item/<int:id>')
 def item(id):
 	item = Item.query.get(id)
-	return render_template('item.html', item=item)
+	comment = Comment.query.filter_by(item_id = id).order_by(Comment.created_at.desc()).all
+	return render_template('item.html', item=item,comment=comment)
 
 # stripe stuffs
 @app.route('/payment_success')
@@ -331,6 +332,19 @@ def verify_reset_token(token):
     except (SignatureExpired, BadSignature):
         raise Exception('Token expired or invalid')
     return email
+
+@app.route('/item/<int:item_id>/review', methods=['POST'])
+@login_required
+def submit_review(item_id):
+    print(request)
+    rating = float(request.form['rating'])
+    comment = request.form['content']
+    review = Comment(item_id=item_id, user_id=current_user.id, rating=rating, content=comment)
+    db.session.add(review)
+    db.session.commit()
+    flash("Your review has been submitted!", "success")
+    return redirect(url_for('item', id=item_id))
+
 # Define your model class for the 'signup' table
 # class Signup(db.Model):
 #     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

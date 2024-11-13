@@ -16,6 +16,7 @@
 	{% endfor %}
 	{% endwith %}
 
+
 	<style>
 		.product-image {
 			max-width: 100%;
@@ -149,6 +150,50 @@
 		.arrow-button:hover {
 			transform: scale(1.2);
 		}
+		.review {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+}
+
+
+.review-date {
+    color: gray;
+    font-size: 0.9rem;
+    margin-left: auto;
+}
+
+.review-rating .checked {
+    color: #ffa41c;
+}
+
+.review-comment {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.review-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.helpful-btn, .report-btn {
+    background: none;
+    border: none;
+    color: #0073bb;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 5px;
+}
+
+.helpful-btn:hover, .report-btn:hover {
+    text-decoration: underline;
+}
 	</style>
 	<div style="margin:10px 20px 10px 20px">
 		<div class="relatedItem">
@@ -212,4 +257,63 @@
 		</div>
 	</div>
 
+	<!-- Phần hiển thị và thêm review -->
+<div class="container my-5">
+    <h3>Customer Reviews</h3>
+    <!-- Vòng lặp hiển thị các review -->
+    {% for comment in item.comments %}
+        <div class="review">
+			<div class="review-header">
+				<i class="fa-solid fa-user"></i>&nbsp;
+				<strong> {{ comment.user.name }}</strong>
+				<span class="review-date">{{ comment.created_at.strftime('%Y-%m-%d') }}</span>
+			</div>
+            <div class="review-rating">
+			{% for i in range(comment.rating) %}
+            	<i class="fa fa-star checked"></i>
+            {% endfor %}
+            {% for i in range(5 - comment.rating) %}
+            	<i class="fa fa-star"></i>
+            {% endfor %}
+			</div>
+            <p class="review-comment">{{ comment.content }}</p>
+            <div class="review-footer">
+				<button class="helpful-btn">Helpful</button>
+				<button class="report-btn">Report</button>
+        	</div>
+        </div>
+    {% else %}
+        <p>No reviews yet. Be the first to review this product!</p>
+    {% endfor %}
+
+    <!-- Form thêm review cho người dùng đã đăng nhập -->
+
+    {% if current_user.is_authenticated %}
+    <h3 class="user-comment">Review Product</h3>
+    <form action="{{ url_for('submit_review', item_id=item.id) }}" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <label for="rating">Rating:</label>
+            <select name="rating" id="rating" required style="width: 50px;">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        
+        <label for="comment">Comment:</label>
+        <textarea name="content" id="content" required style="width: 100%; height: 100px;"></textarea>
+        
+        <button type="submit" style=" background-color: #FF728F; cursor: pointer;width:fit-content">
+            <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="blue" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="2,21 23,12 2,3 2,10 17,12 2,14" />
+            </svg> -->
+			Submit review
+        </button>
+    </form>
+{% else %}
+    <p>Please <a href="{{ url_for('login') }}">log in</a> to leave a review.</p>
+{% endif %}
+</div>
 	{% endblock %}

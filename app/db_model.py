@@ -1,6 +1,6 @@
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy.orm import relationship
 import datetime
 db = SQLAlchemy()
 class User(UserMixin,db.Model):
@@ -38,6 +38,7 @@ class Item(db.Model):
     image = db.Column(db.String(250), nullable=False)
     details = db.Column(db.String(250), nullable=False)
     rating = db.Column(db.Float,nullable = True)
+    comments = relationship('Comment', back_populates='item')
     price_id = db.Column(db.String(250), nullable=False)
     orders = db.relationship("Ordered_item", backref="item")
     in_cart = db.relationship("Cart", backref="item")
@@ -66,15 +67,16 @@ class Ordered_item(db.Model):
 	itemid = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
 	quantity = db.Column(db.Integer, db.ForeignKey('cart.quantity'), nullable=False)
   
-class Commnent(db.Model):
+class Comment(db.Model):
     __tablename__ = "comment"
-    id = db.Column(db.Integer,primary_key = True)
-    content = db.Column(db.Text, nullable = False)
-    create_at = db.Column(db.DateTime,default = datetime.datetime.now())
+    id = db.Column(db.Integer,primary_key = True,autoincrement=True)
+    content = db.Column(db.Text, nullable = True)
+    created_at = db.Column(db.DateTime,default = datetime.datetime.now(),nullable=True)
+    rating = db.Column(db.Integer,default = 0, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('comments', lazy=True))
-    product = db.relationship('Item', backref=db.backref('comments', lazy=True))
+    item = relationship('Item', back_populates='comments')
     def __repr__(self):
         return f"<Comment {self.content[:20]} by User {self.user_id}>"
     
