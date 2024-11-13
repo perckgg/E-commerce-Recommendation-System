@@ -1,42 +1,234 @@
 {% extends "base.html" %}
 
 {% block title %}
-	{{ item.name }} - Flask-O-shop
+{{ item.name }} - Flask-O-shop
 {% endblock %}
 
 {% block content %}
-	{% with msgs =  get_flashed_messages(with_categories=True) %}
-	{% for c, msg in msgs %}
-		{% if c == 'error' %}
-			<div class="flash-error">
-		{% else %}
-			<div class="success">
+{% with msgs = get_flashed_messages(with_categories=True) %}
+{% for c, msg in msgs %}
+{% if c == 'error' %}
+<div class="flash-error">
+	{% else %}
+	<div class="success">
 		{% endif %}
-			{{ msg | safe}}</div><br>
+		{{ msg | safe}}</div><br>
 	{% endfor %}
 	{% endwith %}
 
-			<div class="item-display">
-				<div class="img-wrapper">
-					<img src="{{ item.image }}" class="pic">
-				</div>
-				<b>{{ item.name }}</b>
-				<span class="right-item">${{ item.price }}</span><br>
-                <i class="fa fa-star checked"></i>
-                <i class="fa fa-star checked"></i>
-                <i class="fa fa-star checked"></i>
-                <i class="fa fa-star checked"></i>
-                <i class="fa fa-star checked"></i>
-                <span class="text-muted" >({{ range(1, 51) | random }})</span>
-                <div class="details">{{ item.details | safe }}</div>
+	<div class="item-display">
+		<div class="img-wrapper">
+			<img src="{{ item.image }}" class="pic">
+		</div>
+		<b>{{ item.name }}</b>
+		<span class="right-item">${{ item.price }}</span><br>
+		<i class="fa fa-star checked"></i>
+		<i class="fa fa-star checked"></i>
+		<i class="fa fa-star checked"></i>
+		<i class="fa fa-star checked"></i>
+		<i class="fa fa-star checked"></i>
+		<span class="text-muted">({{ range(1, 51) | random }})</span>
+		<div class="details">{{ item.details | safe }}</div>
 
-                <form action="{{ url_for('add_to_cart', id=item.id) }}" method="POST">
-                    Quantity: 
-                    <input type="number" value="1" name="quantity" min="1" max="50" onkeyup="if(this.value > 50) this.value=50;" required>
-                    <br><br>
-					<input type="submit" class="add-to-cart" value="Add to Cart" name="add">
-                </form>
-				</a>
+		<form action="{{ url_for('add_to_cart', id=item.id) }}" method="POST">
+			Quantity:
+			<input type="number" value="1" name="quantity" min="1" max="50" onkeyup="if(this.value > 50) this.value=50;"
+				required>
+			<br><br>
+			<input type="submit" class="add-to-cart" value="Add to Cart" name="add">
+		</form>
+		</a>
+	</div>
+
+	<style>
+		.product-image {
+			max-width: 100%;
+			border-radius: 8px;
+		}
+
+		.price {
+			color: #d9534f;
+			font-size: 1.5rem;
+			font-weight: bold;
+		}
+
+		.list-price {
+			text-decoration: line-through;
+			color: gray;
+			font-size: 0.9rem;
+		}
+
+		.buy-now-btn {
+			background-color: #f0c14b;
+			border-color: #a88734;
+			color: #111;
+			font-weight: bold;
+		}
+
+		.add-to-cart-btn {
+			background-color: #ffa41c;
+			border-color: #ff8f00;
+			color: white;
+			font-weight: bold;
+		}
+	</style>
+	</head>
+
+	<div class="container my-5" style="width: 100%;">
+		<div class="row">
+			<!-- Product Image -->
+			<div class="col-md-6 text-center">
+				<img src="https://m.media-amazon.com/images/I/71S9dis6PRL._AC_SL1500_.jpg" alt="SteelSeries Headset"
+					class="product-image">
 			</div>
+			<!-- Product Info -->
+			<div class="col-md-6">
+				<h2>SteelSeries New Arctis Nova 3 Multi-Platform Gaming Headset</h2>
+				<p><strong>Brand:</strong> SteelSeries</p>
+				<p><strong>Color:</strong> Black</p>
+				<p><strong>Compatible Devices:</strong> PC, PS5/PS4, Xbox Series X|S, Switch, Mobile</p>
+				<p><span class="list-price">$99.99</span> <span class="price">$86.74</span></p>
+				<p><strong>In Stock</strong></p>
+				<p class="text-muted">Ships from and sold by Amazon.com</p>
+				<!-- Buttons -->
+				<div class="d-flex gap-2">
+					<button class="btn add-to-cart-btn w-50">Add to Cart</button>
+					<button class="btn buy-now-btn w-50">Buy Now</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-{% endblock %}
+	<style>
+		.relatedItem {
+			display: flex;
+			align-items: center;
+			margin: 20px 0;
+		}
+
+		.divider-line {
+			flex-grow: 1;
+			border-bottom: 1px dotted #aeaeae;
+			margin-left: 5px;
+		}
+
+		.section-label {
+			background-color: #f05442;
+			color: white;
+			padding: 10px 20px;
+			border-radius: 20px;
+			font-size: 16px;
+			font-weight: bold;
+			margin-right: 10px;
+		}
+
+		.item-olistshop {
+
+			display: flex;
+			align-items: center;
+			background-color: white;
+			justify-content: center;
+			color: white;
+			font-weight: bold;
+			font-size: 16px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+			padding: 5px;
+			/* Smooth transition */
+		}
+
+		.item-olistshop:hover {
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+			transform: translateY(-2px);
+		}
+
+		.arrow-button {
+			position: absolute;
+			top: 50%;
+			right: -20px;
+			/* Move slightly outside the card */
+			width: 40px;
+			height: 40px;
+			background-color: white;
+			border: 1px solid #ddd;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+			transition: right 0.3s ease;
+		}
+
+		.arrow-button i {
+			font-size: 20px;
+			color: #333;
+		}
+
+		.arrow-button:hover {
+			transform: scale(1.2);
+		}
+	</style>
+	<div style="margin:10px 20px 10px 20px">
+		<div class="relatedItem">
+			<div class="section-label">From the same shop</div>
+			<div class="divider-line"></div>
+		</div>
+		<div class="row justify-content-between" style="position: relative; width: 100%;">
+			{%for i in range(1,7)%}
+			<a href="{{ url_for('item', id=item.id) }}" class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+				<div class="item-olistshop">
+					<div class="item-wrapper">
+						<div class="img-wrapper">
+							<img src="{{ item.image }}" class="pic">
+						</div>
+						{{ item.name }}
+						<span class="right-item">${{ item.price }}</span><br>
+						<i class="fa fa-star checked"></i>
+						<i class="fa fa-star checked"></i>
+						<i class="fa fa-star checked"></i>
+						<i class="fa fa-star checked"></i>
+						<i class="fa fa-star checked"></i>
+						<span class="text-muted">({{ range(1, 51) | random }})</span>
+					</div>
+				</div>
+			</a>
+			{% endfor %}
+			<div class="arrow-button">
+				<i class="fas fa-chevron-right"></i>
+			</div>
+		</div>
+	</div>
+
+	<div style="margin:10px 20px 10px 20px;">
+		<div class="relatedItem">
+			<div class="section-label">You May Also Like</div>
+			<div class="divider-line"></div>
+		</div>
+		<div class="row justify-content-between" style="position: relative; width: 100%;">
+			{%for i in range(1,7)%}
+			<a href="{{ url_for('item', id=item.id) }}" class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+				<div class="item-olistshop">
+					<div class="item-wrapper">
+						<div class="img-wrapper">
+							<img src="{{ item.image }}" class="pic">
+						</div>
+						{{ item.name }}
+						<span class="right-item">${{ item.price }}</span><br>
+						<i class="fa fa-star checked"></i>
+						<i class="fa fa-star checked"></i>
+						<i class="fa fa-star checked"></i>
+						<i class="fa fa-star checked"></i>
+						<i class="fa fa-star checked"></i>
+						<span class="text-muted">({{ range(1, 51) | random }})</span>
+					</div>
+				</div>
+			</a>
+			{% endfor %}
+			<div class="arrow-button">
+				<i class="fas fa-chevron-right"></i>
+			</div>
+		</div>
+	</div>
+
+	{% endblock %}
