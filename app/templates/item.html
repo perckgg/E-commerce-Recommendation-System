@@ -16,30 +16,6 @@
 	{% endfor %}
 	{% endwith %}
 
-	<div class="item-display">
-		<div class="img-wrapper">
-			<img src="{{ item.image }}" class="pic">
-		</div>
-		<b>{{ item.name }}</b>
-		<span class="right-item">${{ item.price }}</span><br>
-		<i class="fa fa-star checked"></i>
-		<i class="fa fa-star checked"></i>
-		<i class="fa fa-star checked"></i>
-		<i class="fa fa-star checked"></i>
-		<i class="fa fa-star checked"></i>
-		<span class="text-muted">({{ range(1, 51) | random }})</span>
-		<div class="details">{{ item.details | safe }}</div>
-
-		<form action="{{ url_for('add_to_cart', id=item.id) }}" method="POST">
-			Quantity:
-			<input type="number" value="1" name="quantity" min="1" max="50" onkeyup="if(this.value > 50) this.value=50;"
-				required>
-			<br><br>
-			<input type="submit" class="add-to-cart" value="Add to Cart" name="add">
-		</form>
-		</a>
-	</div>
-
 	<style>
 		.product-image {
 			max-width: 100%;
@@ -78,8 +54,7 @@
 		<div class="row">
 			<!-- Product Image -->
 			<div class="col-md-6 text-center">
-				<img src="https://m.media-amazon.com/images/I/71S9dis6PRL._AC_SL1500_.jpg" alt="SteelSeries Headset"
-					class="product-image">
+				<img src="{{item.image}}" alt="SteelSeries Headset" class="product-image">
 			</div>
 			<!-- Product Info -->
 			<div class="col-md-6">
@@ -91,10 +66,16 @@
 				<p><strong>In Stock</strong></p>
 				<p class="text-muted">Ships from and sold by Amazon.com</p>
 				<!-- Buttons -->
-				<div class="d-flex gap-2">
-					<button class="btn add-to-cart-btn w-50">Add to Cart</button>
-					<button class="btn buy-now-btn w-50">Buy Now</button>
-				</div>
+
+				<form action="{{url_for('add_to_cart',id=item.id)}}" method="POST">
+					Quantity:
+					<input type="number" value="1" name="quantity" min="1" max="50"
+						onkeyup="if(this.value > 50) this.value=50;" required>
+					<br><br>
+					<input type="submit" class="add-to-cart" value="Add to Cart" name="add">
+				</form>
+
+
 			</div>
 		</div>
 	</div>
