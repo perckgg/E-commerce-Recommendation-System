@@ -4,14 +4,15 @@ from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_dance.contrib.google import make_google_blueprint, google
 from werkzeug.security import generate_password_hash, check_password_hash
-from .form import LoginForm, RegisterForm
+from flask_mail import Message
+from .form import LoginForm, RegisterForm,RequestResetForm,ResetPasswordForm
 from .db_model import  db,User, Item
 from .funcs import mail, send_confirmation_email, fulfill_order
 from dotenv import load_dotenv
 from .admin.route import admin
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer,SignatureExpired, BadSignature
 from sqlalchemy import func
-
+import secrets
 import pandas as pd
 import random
 from flask_sqlalchemy import SQLAlchemy
@@ -46,6 +47,7 @@ app.config['MAIL_SERVER'] = "smtp.googlemail.com"
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_PORT'] = 587
 stripe.api_key = os.environ["STRIPE_PRIVATE"]
+app.config['SECURITY_PASSWORD_SALT'] = os.getenv("SECURITY_PASSWORD_SALT")
 
 # db = SQLAlchemy(app)
 Bootstrap(app)
@@ -275,6 +277,60 @@ def stripe_webhook():
 	# Passed signature verification
 	return {}, 200
 
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            token = generate_reset_token(user)
+            send_reset_email(user, token)
+            flash('An email with instructions to reset your password has been sent.', 'info')
+            return redirect(url_for('login'))
+        else:
+            flash('Email not found.', 'danger')
+    return render_template('request_password_reset.html', form=form)
+def generate_reset_token(user, expires_sec=1800):
+    """Tạo một token để xác thực người dùng khi đặt lại mật khẩu"""
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    return serializer.dumps(user.email, salt=app.config['SECURITY_PASSWORD_SALT'])
+
+def send_reset_email(user, token):
+    """Gửi email với liên kết đặt lại mật khẩu"""
+    reset_link = url_for('reset_password', token=token, _external=True)
+    msg = Message('Password Reset Request', sender='hoangkhanghcmut@gmail.com', recipients=[user.email])
+    msg.body = f'''To reset your password, visit the following link:
+{reset_link}
+
+If you did not request this, please ignore this email.
+'''
+    mail.send(msg)
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        email = verify_reset_token(token)
+    except (SignatureExpired, BadSignature):
+        flash('The token is expired or invalid', 'danger')
+        return redirect(url_for('reset_password_request'))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.password = generate_password_hash(form.password.data)
+            db.session.commit()
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('login'))
+    return render_template('reset_password.html', form=form)
+
+def verify_reset_token(token):
+    """Xác thực token và lấy lại email người dùng từ token"""
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(token, salt=app.config['SECURITY_PASSWORD_SALT'], max_age=1800)
+    except (SignatureExpired, BadSignature):
+        raise Exception('Token expired or invalid')
+    return email
 # Define your model class for the 'signup' table
 # class Signup(db.Model):
 #     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

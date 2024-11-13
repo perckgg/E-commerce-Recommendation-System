@@ -15,3 +15,12 @@ class RegisterForm(FlaskForm):
 	password = PasswordField("Password:", validators=[DataRequired(), Regexp("^[a-zA-Z0-9_\\-&$@#!%^*+.]{8,30}$", message='Password must be 8 characters long and should contain letters, numbers and symbols.')])
 	confirm = PasswordField("Confirm Password:",validators=[EqualTo('password', message='Passwords must match')])
 	submit = SubmitField("Register")
+ 
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired()])
+    submit = SubmitField('Reset Password')
