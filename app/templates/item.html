@@ -8,6 +8,7 @@
 {% with msgs = get_flashed_messages(with_categories=True) %}
 {% for c, msg in msgs %}
 {% if c == 'error' %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"></script>
 <div class="flash-error">
 	{% else %}
 	<div class="success">
@@ -80,7 +81,56 @@
 			</div>
 		</div>
 	</div>
-
+<style>
+	/* Star Rating Container */
+	.rating-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+	.star-rating {
+		display: flex;
+		flex-direction: row-reverse;
+		justify-content: flex-end;
+		gap: 5px;
+	}
+	
+	/* Hide Radio Buttons */
+	.star-rating input[type="radio"] {
+		display: none;
+	}
+	
+	/* Style Stars */
+	.star-rating .star {
+		font-size: 30px;
+		color: gray;
+		cursor: pointer;
+		transition: color 0.3s ease;
+	}
+	
+	/* Hover Effect for Stars */
+	.star-rating .star:hover,
+	.star-rating .star:hover ~ .star {
+		color: gold;
+	}
+	
+	/* Selection Effect for Stars */
+	.star-rating input[type="radio"]:checked ~ .star {
+		color: gold;
+	}
+	
+	/* Active Stars for Custom Logic */
+	.star-rating .star.active,
+	.star-rating .star.active ~ .star {
+		color: gold;
+	}
+	/* Hiệu ứng hover cho nút */
+.submit-review-btn:hover {
+    background-color: #fc1b48; /* Màu tối hơn khi hover */
+    transform: scale(1.01); /* Phóng to nhẹ khi hover */
+}
+	</style>
 	<style>
 		.relatedItem {
 			display: flex;
@@ -257,7 +307,7 @@
 		</div>
 	</div>
 
-	<!-- Phần hiển thị và thêm review -->
+<!-- Phần hiển thị và thêm review -->
 <div class="container my-5">
     <h3>Customer Reviews</h3>
     <!-- Vòng lặp hiển thị các review -->
@@ -287,33 +337,88 @@
     {% endfor %}
 
     <!-- Form thêm review cho người dùng đã đăng nhập -->
-
-    {% if current_user.is_authenticated %}
+	{% if current_user.is_authenticated %}
     <h3 class="user-comment">Review Product</h3>
     <form action="{{ url_for('submit_review', item_id=item.id) }}" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
-        <div style="display: flex; align-items: center; gap: 5px;">
+        <div style="display: flex; align-items: flex-start; gap: 5px; flex-direction: column;">
             <label for="rating">Rating:</label>
-            <select name="rating" id="rating" required style="width: 50px;">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </select>
+            <div class="star-rating">
+                <input type="radio" name="rating" id="star-5" value="5">
+                <label for="star-5" class="star" data-value="5">&#9733;</label>
+
+                <input type="radio" name="rating" id="star-4" value="4">
+                <label for="star-4" class="star" data-value="4">&#9733;</label>
+
+                <input type="radio" name="rating" id="star-3" value="3">
+                <label for="star-3" class="star" data-value="3">&#9733;</label>
+
+                <input type="radio" name="rating" id="star-2" value="2">
+                <label for="star-2" class="star" data-value="2">&#9733;</label>
+
+                <input type="radio" name="rating" id="star-1" value="1">
+                <label for="star-1" class="star" data-value="1">&#9733;</label>
+            </div>
         </div>
         
         <label for="comment">Comment:</label>
         <textarea name="content" id="content" required style="width: 100%; height: 100px;"></textarea>
         
-        <button type="submit" style=" background-color: #FF728F; cursor: pointer;width:fit-content">
-            <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="blue" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="2,21 23,12 2,3 2,10 17,12 2,14" />
-            </svg> -->
-			Submit review
+        <button class="btn btn-primary submit-review-btn" type="submit" style=" background-color: #FF728F; cursor: pointer; width: fit-content;">
+            Submit review
         </button>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				const stars = document.querySelectorAll(".star-rating .star");
+				let selectedRating = null; // Track the selected rating
+			
+				stars.forEach((star) => {
+					star.addEventListener("click", (e) => {
+						const value = parseInt(star.dataset.value);
+			
+						// If the same star is clicked again, clear the selection
+						if (selectedRating === value) {
+							selectedRating = null;
+							clearActiveStars();
+						} else {
+							// Set the new rating and highlight stars
+							selectedRating = value;
+							highlightStars(value);
+						}
+					});
+			
+					star.addEventListener("mouseover", () => {
+						const value = parseInt(star.dataset.value);
+						highlightStars(value);
+					});
+			
+					star.addEventListener("mouseout", () => {
+						// Reset to selected stars or none if no selection
+						highlightStars(selectedRating);
+					});
+				});
+			
+				function highlightStars(value) {
+					stars.forEach((star) => {
+						if (parseInt(star.dataset.value) <= value) {
+							star.classList.add("active");
+						} else {
+							star.classList.remove("active");
+						}
+					});
+				}
+			
+				function clearActiveStars() {
+					stars.forEach((star) => {
+						star.classList.remove("active");
+					});
+				}
+			});
+			</script>
     </form>
+
 {% else %}
     <p>Please <a href="{{ url_for('login') }}">log in</a> to leave a review.</p>
 {% endif %}
 </div>
 	{% endblock %}
+
