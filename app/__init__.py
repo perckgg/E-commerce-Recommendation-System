@@ -352,10 +352,16 @@ def verify_reset_token(token):
 @app.route('/item/<int:item_id>/review', methods=['POST'])
 @login_required
 def submit_review(item_id):
-    print(request)
-    rating = float(request.form['rating'])
-    comment = request.form['content']
-    review = Comment(item_id=item_id, user_id=current_user.id, rating=rating, content=comment)
+    # Lấy dữ liệu từ form
+    rating = request.form.get('rating')  # Có thể là None
+    comment = request.form.get('content', '').strip()  # Mặc định là chuỗi rỗng nếu không có
+
+    # Kiểm tra đầu vào
+    if not rating and not comment:  # Nếu cả rating và comment đều trống
+        flash("Please provide a rating or a comment to submit a review.", "warning")
+        return redirect(url_for('item', id=item_id))  # Quay lại trang sản phẩm
+    review = Comment(item_id=item_id, user_id=current_user.id, rating=rating, content=comment if comment else '')
+    
     db.session.add(review)
     db.session.commit()
     flash("Your review has been submitted!", "success")

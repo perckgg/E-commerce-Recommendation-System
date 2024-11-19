@@ -38,10 +38,17 @@ class Item(db.Model):
     image = db.Column(db.String(250), nullable=False)
     details = db.Column(db.String(250), nullable=False)
     rating = db.Column(db.Float,nullable = True)
+    rating_count = db.Column(db.Integer,nullable = True)
+    comment_count = db.Column(db.Integer,nullable = True)
     comments = relationship('Comment', back_populates='item')
     price_id = db.Column(db.String(250), nullable=False)
     orders = db.relationship("Ordered_item", backref="item")
     in_cart = db.relationship("Cart", backref="item")
+    
+    def ins_comment_count():
+        pass
+    def ins_rating_count():
+        pass
     
  
 
