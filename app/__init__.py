@@ -355,13 +355,18 @@ def submit_review(item_id):
     # Lấy dữ liệu từ form
     rating = request.form.get('rating')  # Có thể là None
     comment = request.form.get('content', '').strip()  # Mặc định là chuỗi rỗng nếu không có
-
+	# Tìm Item liên quan
+    item = Item.query.get_or_404(item_id)
     # Kiểm tra đầu vào
     if not rating and not comment:  # Nếu cả rating và comment đều trống
         flash("Please provide a rating or a comment to submit a review.", "warning")
         return redirect(url_for('item', id=item_id))  # Quay lại trang sản phẩm
     review = Comment(item_id=item_id, user_id=current_user.id, rating=rating, content=comment if comment else '')
+    # Cập nhật rating_count và comment_count
+    if rating:
+        item.rating_count = item.rating_count + 1 if item.rating_count else 1  # Tăng rating_count
     
+    item.comment_count = item.comment_count + 1 if item.comment_count else 1  # Tăng comment_count
     db.session.add(review)
     db.session.commit()
     flash("Your review has been submitted!", "success")
