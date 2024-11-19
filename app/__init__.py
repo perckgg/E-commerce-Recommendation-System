@@ -126,10 +126,26 @@ def google_login():
         return redirect(url_for("login"))
 @app.route('/search')
 def search():
-	query = request.args['query']
-	search = "%{}%".format(query)
-	items = Item.query.filter(Item.name.like(search)).all()
-	return render_template('home.html', items=items, search=True, query=query)
+    query = request.args.get('query', '').strip()  # Lấy từ khóa và loại bỏ khoảng trắng thừa
+    if not query:  # Nếu không có từ khóa, trả về tất cả sản phẩm
+        flash("Please enter a keyword to search.", "info")
+        return redirect(url_for('home'))
+
+    # Tìm kiếm sản phẩm theo từ khóa
+    search = f"%{query}%"
+    items = (
+        Item.query.filter(Item.name.like(search))
+        .order_by(Item.rating.desc(), Item.rating_count.desc())  # Sắp xếp theo rating và số lượng đánh giá
+        .all()
+    )
+
+    # Nếu không tìm thấy kết quả
+    if not items:
+        flash("No products found for your search. Try another keyword.", "warning")
+        return redirect(url_for('home'))
+
+    # Hiển thị kết quả tìm kiếm
+    return render_template('home.html', items=items, search=True, query=query)
 
 @app.route("/register", methods=['POST', 'GET'])
 def register():
