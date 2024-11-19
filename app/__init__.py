@@ -363,8 +363,16 @@ def submit_review(item_id):
         return redirect(url_for('item', id=item_id))  # Quay lại trang sản phẩm
     review = Comment(item_id=item_id, user_id=current_user.id, rating=rating, content=comment if comment else '')
     # Cập nhật rating_count và comment_count
+    # Cập nhật rating_count và comment_count
     if rating:
-        item.rating_count = item.rating_count + 1 if item.rating_count else 1  # Tăng rating_count
+        item.rating_count = (item.rating_count or 0) + 1  # Tăng rating_count
+
+        # Lấy tổng các rating hiện tại và thêm rating mới
+        total_rating_sum = db.session.query(db.func.sum(Comment.rating)).filter(Comment.item_id == item_id).scalar() or 0
+        total_rating_sum += float(rating)
+
+        # Tính trung bình cộng rating
+        item.rating = total_rating_sum / item.rating_count
     
     item.comment_count = item.comment_count + 1 if item.comment_count else 1  # Tăng comment_count
     db.session.add(review)

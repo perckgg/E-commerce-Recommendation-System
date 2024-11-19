@@ -1,0 +1,54 @@
+
+{% block listitem %}
+<div class="items">
+    {% for item in items %}
+    <a href="{{ url_for('item', id=item.id) }}">
+        <div class="item">
+            <div class="item-wrapper">
+                <div class="img-wrapper">
+                    <img src="{{ item.image }}" class="pic">
+                </div>
+                {{ item.name }}
+                <span class="right-item">${{ item.price }}</span><br>
+
+                <!-- Hiển thị sao -->
+                <div class="rating">
+                    {% set full_stars = item.rating|int %}  <!-- Số sao vàng -->
+                    {% set half_star = 1 if (item.rating - full_stars) >= 0.5 else 0 %}  <!-- Sao nửa -->
+                    {% set empty_stars = 5 - full_stars - half_star %}  <!-- Sao không có màu -->
+
+                    <!-- Sao đầy -->
+                    {% for _ in range(full_stars) %}
+                    <i class="fa fa-star checked"></i>
+                    {% endfor %}
+
+                    <!-- Sao nửa -->
+                    {% if half_star %}
+                    <i class="fa fa-star-half-o checked"></i>
+                    {% endif %}
+
+                    <!-- Sao rỗng -->
+                    {% for _ in range(empty_stars) %}
+                    <i class="fa fa-star-o"></i>
+                    {% endfor %}
+                </div>
+                <span class="text-muted">({{ item.rating_count if item.rating_count else 0 }})</span>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+<style>
+    .checked {
+        color: gold; /* Ngôi sao vàng */
+    }
+
+    .fa-star-o {
+        color: #ddd; /* Sao viền xám (trống) */
+    }
+
+    .fa-star-half-o {
+        color: gold; /* Ngôi sao vàng nửa */
+    }
+</style>
+{% endblock %}
