@@ -21,7 +21,7 @@
     }
   </style>
 </head>
-
+<script src="https://kit.fontawesome.com/e947109715.js" crossorigin="anonymous"></script>
 
 <body>
 
@@ -34,43 +34,42 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <div class="search-box" style="display: flex; justify-content: center; flex-grow: 1;">
-        <style>
-          .iconsearch {
-            display: flex;
-            height: 35px;
-            background-color: aqua;
-            width: 35px;
-            justify-content: center;
-            align-items: center;
-            border-radius: 0 15px 15px 0;
-          }
+      <form class="search-box" style="display: flex; justify-content: center; flex-grow: 1;"
+      action="{{url_for('search') }}">
+      <style>
+        .iconsearch {
+          display: flex;
+          height: 35px;
+          background-color: #FF728F;
+          width: 35px;
+          justify-content: center;
+          align-items: center;
+          border-radius: 0 15px 15px 0;
+          border: none;
+        }
 
-          .iconsearch:hover {
-            cursor: pointer;
-            background-color: #3399ff;
-          }
+        .iconsearch:hover {
+          cursor: pointer;
+          background-color: #ff6383;
+        }
 
-          .inputsearch:focus {
+        .inputsearch:focus {
+          box-shadow:
+            -3px 0 5px rgba(0, 0, 0, 0.3),
+            0 -3px 5px rgba(0, 0, 0, 0.3),
+            0 3px 5px rgba(0, 0, 0, 0.3);
+          border: 1px solid #999;
+        }
+      </style>
 
-            /* Visible in the full-colour space */
-            box-shadow:
-              -3px 0 5px rgba(0, 0, 0, 0.3),
-              /* Left shadow */
-              0 -3px 5px rgba(0, 0, 0, 0.3),
-              /* Top shadow */
-              0 3px 5px rgba(0, 0, 0, 0.3);
-            /* Bottom shadow */
-            border: 1px solid #999;
-          }
-        </style>
-        
-        <input type="text" placeholder="Search for ..." class="inputsearch"
-          style="padding-left:5px;height: 35px; border-radius: 15px 0 0 15px; background-color: rgb(238, 238, 238);outline:none; border: none; max-width: 300px; width: 80%;"></input>
-        <label for="" class="iconsearch">
-          <i class="fas fa-search"></i>
-        </label>
-      </div>
+      <!-- Input tìm kiếm -->
+      <input type="search" placeholder="Search for ..." class="inputsearch" name="query"
+        style="padding-left:5px;height: 35px; border-radius: 15px 0 0 15px; background-color: rgb(238, 238, 238); outline: none; border: none; max-width: 300px; width: 80%;">
+      <!-- Nút submit chứa biểu tượng -->
+      <button class="iconsearch" type="submit">
+        <i class="fas fa-search" style="color: white;"></i>
+      </button>
+    </form>
 
       <ul class="navbar-nav ml-auto">
         {% if not current_user.is_authenticated %}
