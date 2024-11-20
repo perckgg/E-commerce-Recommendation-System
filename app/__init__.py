@@ -134,15 +134,20 @@ def search():
     # Tìm kiếm sản phẩm theo từ khóa
     search = f"%{query}%"
     items = (
-        Item.query.filter(Item.name.like(search))
-        .order_by(Item.rating.desc(), Item.rating_count.desc())  # Sắp xếp theo rating và số lượng đánh giá
+        Item.query.filter(
+            db.or_(
+                Item.name.ilike(search),
+                Item.category.ilike(search)
+            )
+        )
+        .order_by(Item.rating.desc(), Item.rating_count.desc())
         .all()
     )
 
     # Nếu không tìm thấy kết quả
     if not items:
         flash("No products found for your search. Try another keyword.", "warning")
-        return redirect(url_for('home'))
+        items = Item.query.order_by(Item.rating.desc(), Item.rating_count.desc()).limit(10).all()
 
     # Hiển thị kết quả tìm kiếm
     return render_template('home.html', items=items, search=True, query=query)
