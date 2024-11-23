@@ -1,58 +1,127 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Cart - Flask-O-shop
+    Cart - Flask-O-shop
 {% endblock %}
+
 <script src="https://js.stripe.com/v3/"></script>
+
 {% block content %}
-	{% with msgs =  get_flashed_messages(with_categories=True) %}
-	{% for c, msg in msgs %}
-		{% if c == 'error' %}
-			<div class="flash-error">
-		{% else %}
-			<div class="success">
-		{% endif %}
-			{{ msg | safe }}</div><br>
-	{% endfor %}
-	{% endwith %}
-
-	{% if not items %}
-		<div class="flash-error">
-			Cart is empty!<br>
-			<a href="{{ url_for('home') }}">Discover new items</a>
-		</div>
-	{% else %}
-		<a href="{{ url_for('home') }}" class="right-item">Add more items</a><br><br>
-	{% endif %}
-
-	<div class="items">
-	{% for i in range(items|length) %}
-    <div class="item">
-		<div class="item-wrapper">
-			<div class="img-wrapper">
-				<img src="{{ items[i].image }}" class="pic">
-			</div>
-			<b>{{ items[i].name }}</b>
-			<span class="right-item">${{ items[i].price }}</span><br>
-			Quantity: 
-			<span class="right-item">{{ quantity[i] }}</span><br>
-			Total:
-			<span class="right-item">${{ quantity[i]*items[i].price }}</span>
-			<br><br>
-			<a href="{{ url_for('remove', id=items[i].id, quantity=quantity[i]) }}">
-				<button class="remove-from-cart"> Remove from Cart </button>
-			</a>
-		</div>
-	</div>
+    {% with msgs = get_flashed_messages(with_categories=True) %}
+        {% for c, msg in msgs %}
+            {% if c == 'error' %}
+                <div class="flash-error">
+            {% else %}
+                <div class="success">
+            {% endif %}
+                {{ msg | safe }}</div><br>
         {% endfor %}
-	</div>
-	{% if price %}
-	<div class="check">
-		<form method="POST" action="{{ url_for('create_checkout_session') }}">
-			<input type="hidden" value="{{ price_ids }}" name="price_ids">
-			Grand Total: ${{ price }} <br><br>
-			<button class="bg-success btn-block btn-primary checkout"> Checkout </button>
-		</form>
-	</div>
-	{% endif %}
+    {% endwith %}
+
+    {% if not items %}
+        <div class="flash-error">
+            Cart is empty!<br>
+            <a href="{{ url_for('home') }}">Discover new items</a>
+        </div>
+    {% else %}
+        <a href="{{ url_for('home') }}" class="right-item">Add more items</a><br><br>
+    {% endif %}
+
+    {% if items %}
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in range(items|length) %}
+            <tr>
+                <td>
+                    <img src="{{ items[i].image }}" class="pic" style="width: 100px; height: auto;">
+                </td>
+                <td>{{ items[i].name }}</td>
+                <td>${{ items[i].price }}</td>
+                <td>{{ quantity[i] }}</td>
+                <td>${{ quantity[i]*items[i].price }}</td>
+                <td>
+                    <a href="{{ url_for('remove', id=items[i].id, quantity=quantity[i]) }}">
+                        <button class="remove-from-cart"> Remove </button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if price %}
+    <div class="check">
+        <form method="POST" action="{{ url_for('create_checkout_session') }}">
+            <input type="hidden" value="{{ price_ids }}" name="price_ids">
+            <h3>Grand Total: ${{ price }}</h3>
+            <button class="bg-success btn-block btn-primary checkout"> Checkout </button>
+        </form>
+    </div>
+    {% endif %}
+<style>
+	.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.cart-table th, .cart-table td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.cart-table td img {
+    max-width: 100px;
+    height: auto;
+}
+
+.remove-from-cart {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.remove-from-cart:hover {
+    background-color: #c0392b;
+}
+
+.check {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.checkout {
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.checkout:hover {
+    background-color: #27ae60;
+}
+</style>
 {% endblock %}

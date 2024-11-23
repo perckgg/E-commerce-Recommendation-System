@@ -23,8 +23,8 @@ from datetime import datetime
 import uuid
 
 # load files===========================================================================================================
-trending_products = pd.read_csv("app/models/trending_products.csv")
-train_data = pd.read_csv("app/models/clean_data.csv")
+# trending_products = pd.read_csv("app/models/trending_products.csv")
+# train_data = pd.read_csv("app/models/clean_data.csv")
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 load_dotenv()
