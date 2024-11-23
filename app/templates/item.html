@@ -367,7 +367,7 @@
 						<i class="fa fa-star checked"></i>
 						<i class="fa fa-star checked"></i>
 						<i class="fa fa-star checked"></i>
-						<span class="text-muted">({{ range(1, 51) | random }})</span>
+						<span class="text-muted">({{ item.comment_count}})</span>
 					</div>
 				</div>
 			</a>
@@ -433,7 +433,7 @@
 			</div>
 
 			<label for="comment">Comment:</label>
-			<textarea name="content" id="content" required style="width: 100%; height: 100px;"></textarea>
+			<textarea name="content" id="content" style="width: 100%; height: 100px;"></textarea>
 
 			<button class="btn btn-primary submit-review-btn" type="submit"
 				style=" background-color: #FF728F; cursor: pointer; width: fit-content;">
