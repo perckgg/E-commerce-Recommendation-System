@@ -4,9 +4,6 @@
     Cart - Flask-O-shop
 {% endblock %}
 
-<script src="https://js.stripe.com/v3/"></script>
-
-
 {% block content %}
     {% with msgs = get_flashed_messages(with_categories=True) %}
         {% for c, msg in msgs %}
@@ -29,11 +26,34 @@
     {% endif %}
 
     {% if items %}
+    <script>
+        // Gọi hàm để gắn sự kiện cho tất cả các checkbox khi tải trang
+        window.onload = function () {
+            document.querySelectorAll(".product-check").forEach((checkbox, index) => {
+                checkbox.addEventListener("change", () => {
+                    let minusButton = document.querySelectorAll(".quantity-btn")[index * 2]; // Nút trừ
+                    let plusButton = document.querySelectorAll(".quantity-btn")[index * 2 + 1]; // Nút cộng
+    
+                    if (checkbox.checked) {
+                        minusButton.disabled = true;
+                        plusButton.disabled = true;
+                    } else {
+                        minusButton.disabled = false;
+                        plusButton.disabled = false;
+                    }
+                });
+            });
+        };
+    </script>
     <table class="cart-table">
         <thead>
             <tr>
                 <th>
-                    <input type="checkbox" id="check-all" onclick="checkAllToggle(this)">
+                    <Label class ="Container">
+                        <input type="checkbox" id="check-all" onclick="checkAllToggle(this)">
+                        <span class="checkmark"></span>
+                    </Label>
+                    
                 </th>
                 <th>Image</th>
                 <th>Product</th>
@@ -55,9 +75,9 @@
                 <td>{{ items[i].name }}</td>
                 <td>${{ items[i].price }}</td>
                 <td>
-                    <button onclick="updateQuantity({ i }, -1)" class="quantity-btn">-</button>
+                    <button onclick="updateQuantity({{ i }}, -1)" class="quantity-btn">-</button>
                     <span id="quantity-{{ i }}">{{ quantity[i] }}</span>
-                    <button onclick="updateQuantity({ i }, 1)" class="quantity-btn">+</button>
+                    <button onclick="updateQuantity({{ i }}, 1)" class="quantity-btn">+</button>
                 </td>
                 <td class="product-total">${{ quantity[i]*items[i].price }}</td>
                 <td>
@@ -148,22 +168,63 @@
     .checkout:hover {
         background-color: #27ae60;
     }
+    .quantity-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+</style>
+<style>
+    /* Làm checkbox to hơn */
+    input[type="checkbox"] {
+        width: 20px; /* Độ rộng */
+        height: 20px; /* Chiều cao */
+        cursor: pointer; /* Thêm con trỏ chuột để dễ nhận biết */
+    }
+
+    /* Tùy chọn: Thay đổi giao diện khi checkbox được chọn */
+    input[type="checkbox"]:checked {
+        background-color: #3498db; /* Màu nền khi chọn */
+        border-color: #2980b9; /* Màu viền khi chọn */
+    }
+
+    /* Căn giữa checkbox trong bảng */
+    .product-check {
+        display: block;
+        margin: 0 auto; /* Căn giữa */
+    }
 </style>
 <script>
     function updateQuantity(index, delta) {
-        let quantityElement = document.getElementById(`quantity-${index}`);
-        let currentQuantity = parseInt(quantityElement.innerText);
-        let newQuantity = Math.max(1, currentQuantity + delta); // Ensure quantity is at least 1
-        quantityElement.innerText = newQuantity;
-
-        // Update total for the product
-        let price = parseFloat(document.querySelectorAll(".cart-table tbody tr")[index].querySelector("td:nth-child(4)").innerText.replace("$", ""));
-        let totalElement = document.querySelectorAll(".product-total")[index];
-        totalElement.innerText = `$${(newQuantity * price).toFixed(2)}`;
-
-        // Recalculate grand total
-        updateTotal();
+    // Kiểm tra trạng thái checkbox của sản phẩm
+    let checkbox = document.querySelectorAll(".product-check")[index];
+    if (checkbox.checked) {
+        alert("You cannot change the quantity for a checked product!");
+        return;
     }
+
+    // Nếu checkbox chưa được chọn, tiếp tục thay đổi số lượng
+    let quantityElement = document.getElementById(`quantity-${index}`);
+    let currentQuantity = parseInt(quantityElement.innerText);
+    let newQuantity = Math.max(1, currentQuantity + delta); // Đảm bảo số lượng >= 1
+    quantityElement.innerText = newQuantity;
+
+    // Tìm giá và cập nhật total của sản phẩm
+    let row = document.querySelectorAll(".cart-table tbody tr")[index];
+    let price = parseFloat(row.querySelector("td:nth-child(4)").innerText.replace("$", ""));
+    let totalElement = row.querySelector(".product-total");
+    totalElement.innerText = `$${(newQuantity * price).toFixed(2)}`;
+
+    // Cập nhật tổng tiền toàn bộ giỏ hàng
+    updateTotal();
+}
     function updateTotal() {
         let checkboxes = document.querySelectorAll(".product-check");
         let total = 0;
@@ -186,5 +247,89 @@
         });
         updateTotal();
     }
+    document.querySelectorAll(".product-check").forEach((checkbox, index) => {
+    checkbox.addEventListener("change", () => {
+        let minusButton = document.querySelectorAll(".quantity-btn")[index * 2]; // Nút trừ
+        let plusButton = document.querySelectorAll(".quantity-btn")[index * 2 + 1]; // Nút cộng
+
+        // Disable/Enable nút dựa trên trạng thái checkbox
+        if (checkbox.checked) {
+            minusButton.disabled = true;
+            plusButton.disabled = true;
+        } else {
+            minusButton.disabled = false;
+            plusButton.disabled = false;
+        }
+    });
+});
 </script>
+<style>
+    /* Customize the label (the container) */
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+</style>
 {% endblock %}
