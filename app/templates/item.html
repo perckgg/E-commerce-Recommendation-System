@@ -69,67 +69,163 @@
 				<p class="text-muted">Ships from and sold by Amazon.com</p>
 				<!-- Buttons -->
 
-				<form action="{{url_for('add_to_cart',id=item.id)}}" method="POST">
-					Quantity:
-					<input type="number" value="1" name="quantity" min="1" max="50"
-						onkeyup="if(this.value > 50) this.value=50;" required>
-					<br><br>
+				<style>
+					.quantity {
+						display: flex;
+						border: 2px solid #3498db;
+						border-radius: 4px;
+						overflow: hidden;
+						box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+					}
+
+					.quantity button {
+						background-color: #3498db;
+						color: #fff;
+						border: none;
+						cursor: pointer;
+						font-size: 20px;
+						width: 30px;
+						height: auto;
+						text-align: center;
+						transition: background-color 0.2s;
+						outline: none;
+					}
+
+					.quantity button:hover {
+						background-color: #2980b9;
+					}
+
+					.input-box {
+						width: 40px;
+						text-align: center;
+						border: none;
+						padding: 8px 10px;
+						font-size: 16px;
+						outline: none;
+					}
+
+					/* Hide the number input spin buttons */
+					.input-box::-webkit-inner-spin-button,
+					.input-box::-webkit-outer-spin-button {
+						-webkit-appearance: none;
+						margin: 0;
+					}
+
+					.input-box[type="number"] {
+						-moz-appearance: textfield;
+					}
+				</style>
+				<script>
+					function decrease() {
+						const quantity = document.getElementById('quant')
+						const value = parseInt(quantity.value)
+						value == 1 ? quantity.value = 1 : quantity.value = value - 1
+						{ }
+					}
+					function increase() {
+						const quantity = document.getElementById('quant')
+						const value = parseInt(quantity.value)
+						quantity.value = value + 1
+					}
+				</script>
+
+				<div style="display: flex; align-items: center">
+					<div style="margin-right: 10px; height: 40px;">Quantity: </div>
+					<div class="quantity" style="margin-bottom: 10px">
+						<button class="minus" aria-label="Decrease" onclick="decrease()">&minus;</button>
+						<input id="quant" type="number" class="input-box" value="1" min="1" max="10">
+						<button class=" plus" aria-label="Increase" onclick="increase()">&plus;</button>
+					</div>
+				</div>
+
+				<form id="addToCartForm" method="POST">
 					<input type="submit" class="add-to-cart" value="Add to Cart" name="add">
 				</form>
+
+				<script>
+					document.getElementById('addToCartForm').addEventListener('submit', function (event) {
+						// Prevent the default form submission
+						event.preventDefault();
+
+						// Get the quantity value from the input field
+						const quantity = document.getElementById('quant').value;
+
+						// Ensure the value is valid
+						if (!quantity || quantity <= 0) {
+							alert("Please enter a valid quantity.");
+							return;
+						}
+
+						// Build the dynamic URL
+						const actionUrl = "{{ url_for('add_to_cart', id=item.id) }}";
+						const updatedUrl = `${actionUrl}?quantity=${quantity}`;
+
+						// Update the form's action attribute
+						this.action = updatedUrl;
+
+						// Submit the form
+						this.submit();
+					});
+				</script>
+
 
 
 			</div>
 		</div>
 	</div>
-<style>
-	/* Star Rating Container */
-	.rating-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-}
-	.star-rating {
-		display: flex;
-		flex-direction: row-reverse;
-		justify-content: flex-end;
-		gap: 5px;
-	}
-	
-	/* Hide Radio Buttons */
-	.star-rating input[type="radio"] {
-		display: none;
-	}
-	
-	/* Style Stars */
-	.star-rating .star {
-		font-size: 30px;
-		color: gray;
-		cursor: pointer;
-		transition: color 0.3s ease;
-	}
-	
-	/* Hover Effect for Stars */
-	.star-rating .star:hover,
-	.star-rating .star:hover ~ .star {
-		color: gold;
-	}
-	
-	/* Selection Effect for Stars */
-	.star-rating input[type="radio"]:checked ~ .star {
-		color: gold;
-	}
-	
-	/* Active Stars for Custom Logic */
-	.star-rating .star.active,
-	.star-rating .star.active ~ .star {
-		color: gold;
-	}
-	/* Hiệu ứng hover cho nút */
-.submit-review-btn:hover {
-    background-color: #fc1b48; /* Màu tối hơn khi hover */
-    transform: scale(1.01); /* Phóng to nhẹ khi hover */
-}
+	<style>
+		/* Star Rating Container */
+		.rating-container {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 5px;
+		}
+
+		.star-rating {
+			display: flex;
+			flex-direction: row-reverse;
+			justify-content: flex-end;
+			gap: 5px;
+		}
+
+		/* Hide Radio Buttons */
+		.star-rating input[type="radio"] {
+			display: none;
+		}
+
+		/* Style Stars */
+		.star-rating .star {
+			font-size: 30px;
+			color: gray;
+			cursor: pointer;
+			transition: color 0.3s ease;
+		}
+
+		/* Hover Effect for Stars */
+		.star-rating .star:hover,
+		.star-rating .star:hover~.star {
+			color: gold;
+		}
+
+		/* Selection Effect for Stars */
+		.star-rating input[type="radio"]:checked~.star {
+			color: gold;
+		}
+
+		/* Active Stars for Custom Logic */
+		.star-rating .star.active,
+		.star-rating .star.active~.star {
+			color: gold;
+		}
+
+		/* Hiệu ứng hover cho nút */
+		.submit-review-btn:hover {
+			background-color: #fc1b48;
+			/* Màu tối hơn khi hover */
+			transform: scale(1.01);
+			/* Phóng to nhẹ khi hover */
+		}
 	</style>
 	<style>
 		.relatedItem {
@@ -200,50 +296,53 @@
 		.arrow-button:hover {
 			transform: scale(1.2);
 		}
+
 		.review {
-    border-bottom: 1px solid #ddd;
-    padding: 15px 0;
-}
+			border-bottom: 1px solid #ddd;
+			padding: 15px 0;
+		}
 
-.review-header {
-    display: flex;
-    align-items: center;
-}
+		.review-header {
+			display: flex;
+			align-items: center;
+		}
 
 
-.review-date {
-    color: gray;
-    font-size: 0.9rem;
-    margin-left: auto;
-}
+		.review-date {
+			color: gray;
+			font-size: 0.9rem;
+			margin-left: auto;
+		}
 
-.review-rating .checked {
-    color: #ffa41c;
-}
+		.review-rating .checked {
+			color: #ffa41c;
+		}
 
-.review-comment {
-    margin: 10px 0;
-    line-height: 1.5;
-}
+		.review-comment {
+			margin: 10px 0;
+			line-height: 1.5;
+		}
 
-.review-footer {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+		.review-footer {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
 
-.helpful-btn, .report-btn {
-    background: none;
-    border: none;
-    color: #0073bb;
-    cursor: pointer;
-    font-size: 0.9rem;
-    padding: 5px;
-}
+		.helpful-btn,
+		.report-btn {
+			background: none;
+			border: none;
+			color: #0073bb;
+			cursor: pointer;
+			font-size: 0.9rem;
+			padding: 5px;
+		}
 
-.helpful-btn:hover, .report-btn:hover {
-    text-decoration: underline;
-}
+		.helpful-btn:hover,
+		.report-btn:hover {
+			text-decoration: underline;
+		}
 	</style>
 	<div style="margin:10px 20px 10px 20px">
 		<div class="relatedItem">
@@ -307,118 +406,119 @@
 		</div>
 	</div>
 
-<!-- Phần hiển thị và thêm review -->
-<div class="container my-5">
-    <h3>Customer Reviews</h3>
-    <!-- Vòng lặp hiển thị các review -->
-    {% for comment in item.comments %}
-        <div class="review">
+	<!-- Phần hiển thị và thêm review -->
+	<div class="container my-5">
+		<h3>Customer Reviews</h3>
+		<!-- Vòng lặp hiển thị các review -->
+		{% for comment in item.comments %}
+		<div class="review">
 			<div class="review-header">
 				<i class="fa-solid fa-user"></i>&nbsp;
 				<strong> {{ comment.user.name }}</strong>
 				<span class="review-date">{{ comment.created_at.strftime('%Y-%m-%d') }}</span>
 			</div>
-            <div class="review-rating">
-			{% for i in range(comment.rating) %}
-            	<i class="fa fa-star checked"></i>
-            {% endfor %}
-            {% for i in range(5 - comment.rating) %}
-            	<i class="fa fa-star"></i>
-            {% endfor %}
+			<div class="review-rating">
+				{% for i in range(comment.rating) %}
+				<i class="fa fa-star checked"></i>
+				{% endfor %}
+				{% for i in range(5 - comment.rating) %}
+				<i class="fa fa-star"></i>
+				{% endfor %}
 			</div>
-            <p class="review-comment">{{ comment.content }}</p>
-            <div class="review-footer">
+			<p class="review-comment">{{ comment.content }}</p>
+			<div class="review-footer">
 				<button class="helpful-btn">Helpful</button>
 				<button class="report-btn">Report</button>
-        	</div>
-        </div>
-    {% else %}
-        <p>No reviews yet. Be the first to review this product!</p>
-    {% endfor %}
+			</div>
+		</div>
+		{% else %}
+		<p>No reviews yet. Be the first to review this product!</p>
+		{% endfor %}
 
-    <!-- Form thêm review cho người dùng đã đăng nhập -->
-	{% if current_user.is_authenticated %}
-    <h3 class="user-comment">Review Product</h3>
-    <form action="{{ url_for('submit_review', item_id=item.id) }}" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
-        <div style="display: flex; align-items: flex-start; gap: 5px; flex-direction: column;">
-            <label for="rating">Rating:</label>
-            <div class="star-rating">
-                <input type="radio" name="rating" id="star-5" value="5">
-                <label for="star-5" class="star" data-value="5">&#9733;</label>
+		<!-- Form thêm review cho người dùng đã đăng nhập -->
+		{% if current_user.is_authenticated %}
+		<h3 class="user-comment">Review Product</h3>
+		<form action="{{ url_for('submit_review', item_id=item.id) }}" method="POST"
+			style="display: flex; flex-direction: column; gap: 10px;">
+			<div style="display: flex; align-items: flex-start; gap: 5px; flex-direction: column;">
+				<label for="rating">Rating:</label>
+				<div class="star-rating">
+					<input type="radio" name="rating" id="star-5" value="5">
+					<label for="star-5" class="star" data-value="5">&#9733;</label>
 
-                <input type="radio" name="rating" id="star-4" value="4">
-                <label for="star-4" class="star" data-value="4">&#9733;</label>
+					<input type="radio" name="rating" id="star-4" value="4">
+					<label for="star-4" class="star" data-value="4">&#9733;</label>
 
-                <input type="radio" name="rating" id="star-3" value="3">
-                <label for="star-3" class="star" data-value="3">&#9733;</label>
+					<input type="radio" name="rating" id="star-3" value="3">
+					<label for="star-3" class="star" data-value="3">&#9733;</label>
 
-                <input type="radio" name="rating" id="star-2" value="2">
-                <label for="star-2" class="star" data-value="2">&#9733;</label>
+					<input type="radio" name="rating" id="star-2" value="2">
+					<label for="star-2" class="star" data-value="2">&#9733;</label>
 
-                <input type="radio" name="rating" id="star-1" value="1">
-                <label for="star-1" class="star" data-value="1">&#9733;</label>
-            </div>
-        </div>
-        
-        <label for="comment">Comment:</label>
-        <textarea name="content" id="content"  style="width: 100%; height: 100px;"></textarea>
-        
-        <button class="btn btn-primary submit-review-btn" type="submit" style=" background-color: #FF728F; cursor: pointer; width: fit-content;">
-            Submit review
-        </button>
-		<script>
-			document.addEventListener("DOMContentLoaded", () => {
-				const stars = document.querySelectorAll(".star-rating .star");
-				let selectedRating = null; // Track the selected rating
-			
-				stars.forEach((star) => {
-					star.addEventListener("click", (e) => {
-						const value = parseInt(star.dataset.value);
-			
-						// If the same star is clicked again, clear the selection
-						if (selectedRating === value) {
-							selectedRating = null;
-							clearActiveStars();
-						} else {
-							// Set the new rating and highlight stars
-							selectedRating = value;
+					<input type="radio" name="rating" id="star-1" value="1">
+					<label for="star-1" class="star" data-value="1">&#9733;</label>
+				</div>
+			</div>
+
+			<label for="comment">Comment:</label>
+			<textarea name="content" id="content" style="width: 100%; height: 100px;"></textarea>
+
+			<button class="btn btn-primary submit-review-btn" type="submit"
+				style=" background-color: #FF728F; cursor: pointer; width: fit-content;">
+				Submit review
+			</button>
+			<script>
+				document.addEventListener("DOMContentLoaded", () => {
+					const stars = document.querySelectorAll(".star-rating .star");
+					let selectedRating = null; // Track the selected rating
+
+					stars.forEach((star) => {
+						star.addEventListener("click", (e) => {
+							const value = parseInt(star.dataset.value);
+
+							// If the same star is clicked again, clear the selection
+							if (selectedRating === value) {
+								selectedRating = null;
+								clearActiveStars();
+							} else {
+								// Set the new rating and highlight stars
+								selectedRating = value;
+								highlightStars(value);
+							}
+						});
+
+						star.addEventListener("mouseover", () => {
+							const value = parseInt(star.dataset.value);
 							highlightStars(value);
-						}
+						});
+
+						star.addEventListener("mouseout", () => {
+							// Reset to selected stars or none if no selection
+							highlightStars(selectedRating);
+						});
 					});
-			
-					star.addEventListener("mouseover", () => {
-						const value = parseInt(star.dataset.value);
-						highlightStars(value);
-					});
-			
-					star.addEventListener("mouseout", () => {
-						// Reset to selected stars or none if no selection
-						highlightStars(selectedRating);
-					});
-				});
-			
-				function highlightStars(value) {
-					stars.forEach((star) => {
-						if (parseInt(star.dataset.value) <= value) {
-							star.classList.add("active");
-						} else {
+
+					function highlightStars(value) {
+						stars.forEach((star) => {
+							if (parseInt(star.dataset.value) <= value) {
+								star.classList.add("active");
+							} else {
+								star.classList.remove("active");
+							}
+						});
+					}
+
+					function clearActiveStars() {
+						stars.forEach((star) => {
 							star.classList.remove("active");
-						}
-					});
-				}
-			
-				function clearActiveStars() {
-					stars.forEach((star) => {
-						star.classList.remove("active");
-					});
-				}
-			});
+						});
+					}
+				});
 			</script>
-    </form>
+		</form>
 
-{% else %}
-    <p>Please <a href="{{ url_for('login') }}">log in</a> to leave a review.</p>
-{% endif %}
-</div>
+		{% else %}
+		<p>Please <a href="{{ url_for('login') }}">log in</a> to leave a review.</p>
+		{% endif %}
+	</div>
 	{% endblock %}
-

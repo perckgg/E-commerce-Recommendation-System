@@ -199,7 +199,8 @@ def add_to_cart(id):
 
 	item = Item.query.get(id)
 	if request.method == "POST":
-		quantity = request.form["quantity"]
+		quantity = request.args.get('quantity', None)
+		print("QUANTITY",quantity)
 		current_user.add_to_cart(id, quantity)
 		flash(f'''{item.name} successfully added to the <a href=cart>cart</a>.<br> <a href={url_for("cart")}>view cart!</a>''','success')
 		return redirect(url_for('home'))
