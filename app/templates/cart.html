@@ -6,6 +6,7 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 
+
 {% block content %}
     {% with msgs = get_flashed_messages(with_categories=True) %}
         {% for c, msg in msgs %}
@@ -31,6 +32,9 @@
     <table class="cart-table">
         <thead>
             <tr>
+                <th>
+                    <input type="checkbox" id="check-all" onclick="checkAllToggle(this)">
+                </th>
                 <th>Image</th>
                 <th>Product</th>
                 <th>Price</th>
@@ -43,12 +47,19 @@
             {% for i in range(items|length) %}
             <tr>
                 <td>
+                    <input type="checkbox" class="product-check" onclick="updateTotal()">
+                </td>
+                <td>
                     <img src="{{ items[i].image }}" class="pic" style="width: 100px; height: auto;">
                 </td>
                 <td>{{ items[i].name }}</td>
                 <td>${{ items[i].price }}</td>
-                <td>{{ quantity[i] }}</td>
-                <td>${{ quantity[i]*items[i].price }}</td>
+                <td>
+                    <button onclick="updateQuantity({ i }, -1)" class="quantity-btn">-</button>
+                    <span id="quantity-{{ i }}">{{ quantity[i] }}</span>
+                    <button onclick="updateQuantity({ i }, 1)" class="quantity-btn">+</button>
+                </td>
+                <td class="product-total">${{ quantity[i]*items[i].price }}</td>
                 <td>
                     <a href="{{ url_for('remove', id=items[i].id, quantity=quantity[i]) }}">
                         <button class="remove-from-cart"> Remove </button>
@@ -64,64 +75,116 @@
     <div class="check">
         <form method="POST" action="{{ url_for('create_checkout_session') }}">
             <input type="hidden" value="{{ price_ids }}" name="price_ids">
-            <h3>Grand Total: ${{ price }}</h3>
+            <h3>Grand Total: <span id="grand-total">$0.00</span></h3>
             <button class="bg-success btn-block btn-primary checkout"> Checkout </button>
         </form>
     </div>
     {% endif %}
+
 <style>
-	.cart-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
+    .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
 
-.cart-table th, .cart-table td {
-    text-align: left;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
+    .cart-table th, .cart-table td {
+        text-align: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
 
-.cart-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-}
+    .cart-table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
 
-.cart-table td img {
-    max-width: 100px;
-    height: auto;
-}
+    .cart-table td img {
+        max-width: 100px;
+        height: auto;
+    }
 
-.remove-from-cart {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 5px;
-}
+    .remove-from-cart {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
 
-.remove-from-cart:hover {
-    background-color: #c0392b;
-}
+    .remove-from-cart:hover {
+        background-color: #c0392b;
+    }
 
-.check {
-    margin-top: 20px;
-    text-align: right;
-}
+    .quantity-btn {
+        padding: 5px 10px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
 
-.checkout {
-    background-color: #2ecc71;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
-}
+    .quantity-btn:hover {
+        background-color: #2980b9;
+    }
 
-.checkout:hover {
-    background-color: #27ae60;
-}
+    .check {
+        margin-top: 20px;
+        text-align: right;
+    }
+
+    .checkout {
+        background-color: #2ecc71;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .checkout:hover {
+        background-color: #27ae60;
+    }
 </style>
+<script>
+    function updateQuantity(index, delta) {
+        let quantityElement = document.getElementById(`quantity-${index}`);
+        let currentQuantity = parseInt(quantityElement.innerText);
+        let newQuantity = Math.max(1, currentQuantity + delta); // Ensure quantity is at least 1
+        quantityElement.innerText = newQuantity;
+
+        // Update total for the product
+        let price = parseFloat(document.querySelectorAll(".cart-table tbody tr")[index].querySelector("td:nth-child(4)").innerText.replace("$", ""));
+        let totalElement = document.querySelectorAll(".product-total")[index];
+        totalElement.innerText = `$${(newQuantity * price).toFixed(2)}`;
+
+        // Recalculate grand total
+        updateTotal();
+    }
+    function updateTotal() {
+        let checkboxes = document.querySelectorAll(".product-check");
+        let total = 0;
+
+        checkboxes.forEach((checkbox) => {
+            if (checkbox.checked) {
+                let row = checkbox.closest("tr");
+                let productTotal = parseFloat(row.querySelector(".product-total").innerText.replace("$", ""));
+                total += productTotal;
+            }
+        });
+
+        document.getElementById("grand-total").innerText = `$${total.toFixed(2)}`;
+    }
+
+    function checkAllToggle(source) {
+        let checkboxes = document.querySelectorAll(".product-check");
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = source.checked;
+        });
+        updateTotal();
+    }
+</script>
 {% endblock %}
