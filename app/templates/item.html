@@ -120,6 +120,7 @@
 						const quantity = document.getElementById('quant')
 						const value = parseInt(quantity.value)
 						value == 1 ? quantity.value = 1 : quantity.value = value - 1
+						{ }
 					}
 					function increase() {
 						const quantity = document.getElementById('quant')
@@ -127,18 +128,45 @@
 						quantity.value = value + 1
 					}
 				</script>
+
 				<div style="display: flex; align-items: center">
 					<div style="margin-right: 10px; height: 40px;">Quantity: </div>
 					<div class="quantity" style="margin-bottom: 10px">
-						<button id="quant+" class="minus" aria-label="Decrease" onclick="decrease()">&minus;</button>
+						<button class="minus" aria-label="Decrease" onclick="decrease()">&minus;</button>
 						<input id="quant" type="number" class="input-box" value="1" min="1" max="10">
-						<button id="quant- class=" plus" aria-label="Increase" onclick="increase()">&plus;</button>
+						<button class=" plus" aria-label="Increase" onclick="increase()">&plus;</button>
 					</div>
 				</div>
 
-				<form action="{{url_for('add_to_cart',id=item.id)}}" method="POST">
+				<form id="addToCartForm" method="POST">
 					<input type="submit" class="add-to-cart" value="Add to Cart" name="add">
 				</form>
+
+				<script>
+					document.getElementById('addToCartForm').addEventListener('submit', function (event) {
+						// Prevent the default form submission
+						event.preventDefault();
+
+						// Get the quantity value from the input field
+						const quantity = document.getElementById('quant').value;
+
+						// Ensure the value is valid
+						if (!quantity || quantity <= 0) {
+							alert("Please enter a valid quantity.");
+							return;
+						}
+
+						// Build the dynamic URL
+						const actionUrl = "{{ url_for('add_to_cart', id=item.id) }}";
+						const updatedUrl = `${actionUrl}?quantity=${quantity}`;
+
+						// Update the form's action attribute
+						this.action = updatedUrl;
+
+						// Submit the form
+						this.submit();
+					});
+				</script>
 
 
 
