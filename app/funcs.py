@@ -31,13 +31,17 @@ def fulfill_order(session):
 	""" Fulfils order on successful payment """
 
 	uid = session['client_reference_id']
-	order = Order(uid=uid, date=datetime.datetime.now(), status="processing")
+	max_id = db.session.query(db.func.max(Order.id)).scalar()
+	new_id = max_id + 1 if max_id is not None else 1
+	order = Order(id=new_id,uid=uid, date=datetime.datetime.now(), status="processing")
 	db.session.add(order)
 	db.session.commit()
 
 	current_user = User.query.get(uid)
 	for cart in current_user.cart:
-		ordered_item = Ordered_item(oid=order.id, itemid=cart.item.id, quantity=cart.quantity)
+		max_id = db.session.query(db.func.max(Ordered_item.id)).scalar()
+		new_id = max_id + 1 if max_id is not None else 1
+		ordered_item = Ordered_item(id=new_id,oid=order.id, itemid=cart.item.id, quantity=cart.quantity)
 		db.session.add(ordered_item)
 		db.session.commit()
 		current_user.remove_from_cart(cart.item.id, cart.quantity)

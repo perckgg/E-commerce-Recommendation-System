@@ -200,7 +200,6 @@ def add_to_cart(id):
 	item = Item.query.get(id)
 	if request.method == "POST":
 		quantity = request.args.get('quantity', None)
-		print("QUANTITY",quantity)
 		current_user.add_to_cart(id, quantity)
 		flash(f'''{item.name} successfully added to the <a href=cart>cart</a>.<br> <a href={url_for("cart")}>view cart!</a>''','success')
 		return redirect(url_for('home'))
@@ -252,54 +251,26 @@ def payment_failure():
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
-	data = json.loads(request.form['price_ids'].replace("'", '"'))
-	try:
-		checkout_session = stripe.checkout.Session.create(
-			client_reference_id=current_user.id,
-			line_items=data,
-			payment_method_types=[
-			  'card',
-			],
-			mode='payment',
-			success_url=url_for('payment_success', _external=True),
-			cancel_url=url_for('payment_failure', _external=True),
-		)
-	except Exception as e:
-		return str(e)
-	return redirect(checkout_session.url, code=303)
+    # Lấy dữ liệu giỏ hàng từ form
+    data = json.loads(request.form['price_ids'].replace("'", '"'))
 
-@app.route('/stripe-webhook', methods=['POST'])
-def stripe_webhook():
+    try:
+        # Giả lập thanh toán thành công
+        # (Ở đây bạn có thể tích hợp bất kỳ cổng thanh toán nào hoặc mô phỏng quy trình)
+        payment_id = str(uuid.uuid4())  # Giả lập Payment ID
+        print(f"Payment successful! Payment ID: {payment_id}, User ID: {current_user.id}, Items: {data}")
 
-	if request.content_length > 1024*1024:
-		print("Request too big!")
-		abort(400)
+        # Tạo session giả lập và gọi fulfill_order
+        session = {'client_reference_id': current_user.id}
+        fulfill_order(session)
 
-	payload = request.get_data()
-	sig_header = request.environ.get('HTTP_STRIPE_SIGNATURE')
-	ENDPOINT_SECRET = os.environ.get('ENDPOINT_SECRET')
-	event = None
+        # Chuyển hướng đến trang xác nhận thanh toán thành công
+        return redirect(url_for('payment_success'))
 
-	try:
-		event = stripe.Webhook.construct_event(
-		payload, sig_header, ENDPOINT_SECRET
-		)
-	except ValueError as e:
-		# Invalid payload
-		return {}, 400
-	except stripe.error.SignatureVerificationError as e:
-		# Invalid signature
-		return {}, 400
-
-	if event['type'] == 'checkout.session.completed':
-		session = event['data']['object']
-
-		# Fulfill the purchase...
-		fulfill_order(session)
-
-	# Passed signature verification
-	return {}, 200
-
+    except Exception as e:
+        print(f"Payment failed: {e}")
+        # Xử lý lỗi khi thanh toán không thành công
+        return redirect(url_for('payment_failure'))
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
     form = RequestResetForm()

@@ -61,7 +61,7 @@ class Cart(db.Model):
 
 class Order(db.Model):
 	__tablename__ = "orders"
-	id = db.Column(db.Integer, primary_key=True)
+	id = db.Column(db.Integer, primary_key=True,autoincrement = True)
 	uid = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 	date = db.Column(db.DateTime, nullable=False)
 	status = db.Column(db.String(50), nullable=False)
@@ -69,7 +69,7 @@ class Order(db.Model):
 
 class Ordered_item(db.Model):
 	__tablename__ = "ordered_items"
-	id = db.Column(db.Integer, primary_key=True)
+	id = db.Column(db.Integer, primary_key=True,autoincrement= True)
 	oid = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
 	itemid = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
 	quantity = db.Column(db.Integer, db.ForeignKey('cart.quantity'), nullable=False)

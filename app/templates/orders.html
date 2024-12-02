@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Orders - Flask-O-shop
+	Orders - Ecom-Olist
 {% endblock %}
-<script src="https://js.stripe.com/v3/"></script>
+
 {% block content %}
 	{% with msgs =  get_flashed_messages(with_categories=True) %}
 	{% for c, msg in msgs %}
@@ -16,33 +16,82 @@
 	{% endfor %}
 	{% endwith %}
 
-    {% if not orders %}
-		<div class="flash-error">
-			You haven't placed any orders yet.<br>
-			<a href="{{ url_for('home') }}">Discover new items</a>
-		</div>
-	{% else %}
+	{% if not orders %}
+    <div class="flash-error">
+        You haven't placed any orders yet.<br>
+        <a href="{{ url_for('home') }}">Discover new items</a>
+    </div>
+{% else %}
 
-    <table class="table table-striped">
-        <tr>
-            <th>Order id</th>
-            <th>Order date</th>
-			<th>Ordered items</th>
-			<th>Order status</th>
-        </tr>
-    {% for order in orders %}
-        <tr>
-            <td>{{ order.id }}</td>
-            <td>{{ order.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-			<td>
-				{% for i in order.items %}
-					{{ i.item.name }} x <span class="success">{{ i.quantity }}</span><br>
-				{% endfor %}
-			</td>
-			<td>{{ order.status }}</td>
-        </tr>
-    {% endfor %}
-    </table>
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs" id="orderTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="processing-tab" data-bs-toggle="tab" data-bs-target="#processing" type="button" role="tab" aria-controls="processing" aria-selected="true">
+            Processing
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="shipped-tab" data-bs-toggle="tab" data-bs-target="#shipped" type="button" role="tab" aria-controls="shipped" aria-selected="false">
+            Shipped
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered" type="button" role="tab" aria-controls="delivered" aria-selected="false">
+            Delivered
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab" aria-controls="cancelled" aria-selected="false">
+            Cancelled
+        </button>
+    </li>
+</ul>
 
-	{% endif %}
+<!-- Tab Content -->
+<div class="tab-content" id="orderTabsContent">
+    <!-- Processing Orders -->
+    <div class="tab-pane fade " id="processing" role="tabpanel" aria-labelledby="processing-tab">
+        {% set processing_orders = orders | selectattr('status', 'equalto', 'processing') | list %}
+        {% include 'order_list.html'%}
+    </div>
+
+    <!-- Shipped Orders -->
+    <div class="tab-pane fade show active" id="shipped" role="tabpanel" aria-labelledby="shipped-tab">
+        {% set shipped_orders = orders | selectattr('status', 'equalto', 'shipped') | list %}
+        {% include 'order_list.html' %}
+    </div>
+
+    <!-- Delivered Orders -->
+    <div class="tab-pane fade" id="delivered" role="tabpanel" aria-labelledby="delivered-tab">
+        {% set delivered_orders = orders | selectattr('status', 'equalto', 'delivered') | list %}
+        {% include 'order_list.html' %}
+    </div>
+
+    <!-- Cancelled Orders -->
+    <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+        {% set cancelled_orders = orders | selectattr('status', 'equalto', 'cancelled') | list %}
+        {% include 'order_list.html' %}
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tabEl = document.querySelectorAll('button[data-bs-toggle="tab"]');
+        tabEl.forEach(function (tab) {
+            tab.addEventListener('shown.bs.tab', function (event) {
+                console.log('Tab switched to: ', event.target.getAttribute('data-bs-target'));
+            });
+        });
+    });
+</script>
+<script>
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function () {
+            document.querySelectorAll('.nav-link').forEach(tab => tab.setAttribute('aria-selected', 'false'));
+            this.setAttribute('aria-selected', 'true');
+        });
+    });
+</script>
+
+{% endif %}
+
 {% endblock %}

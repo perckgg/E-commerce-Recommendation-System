@@ -45,50 +45,53 @@
             });
         };
     </script>
-    <table class="cart-table">
-        <thead>
-            <tr>
-                <th>
-                    <Label class ="Container">
-                        <input type="checkbox" id="check-all" onclick="checkAllToggle(this)">
-                        <span class="checkmark"></span>
-                    </Label>
-                    
-                </th>
-                <th>Image</th>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for i in range(items|length) %}
-            <tr>
-                <td>
-                    <input type="checkbox" class="product-check" onclick="updateTotal()">
-                </td>
-                <td>
-                    <img src="{{ items[i].image }}" class="pic" style="width: 100px; height: auto;">
-                </td>
-                <td>{{ items[i].name }}</td>
-                <td>${{ items[i].price }}</td>
-                <td>
-                    <button onclick="updateQuantity({{ i }}, -1)" class="quantity-btn">-</button>
-                    <span id="quantity-{{ i }}">{{ quantity[i] }}</span>
-                    <button onclick="updateQuantity({{ i }}, 1)" class="quantity-btn">+</button>
-                </td>
-                <td class="product-total">${{ quantity[i]*items[i].price }}</td>
-                <td>
-                    <a href="{{ url_for('remove', id=items[i].id, quantity=quantity[i]) }}">
-                        <button class="remove-from-cart"> Remove </button>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class ="table-container" style="width:100%;display:flex;justify-content: center;">
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>
+                        <Label class ="Container">
+                            <input type="checkbox" id="check-all" onclick="checkAllToggle(this)">
+                            <span class="checkmark"></span>
+                        </Label>
+                        
+                    </th>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(items|length) %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="product-check" onclick="updateTotal()">
+                    </td>
+                    <td>
+                        <img src="{{ items[i].image }}" class="pic" style="width: 100px; height: auto;">
+                    </td>
+                    <td>{{ items[i].name }}</td>
+                    <td>${{ items[i].price }}</td>
+                    <td>
+                        <button onclick="updateQuantity({{ i }}, -1)" class="quantity-btn">-</button>
+                        <span id="quantity-{{ i }}">{{ quantity[i] }}</span>
+                        <button onclick="updateQuantity({{ i }}, 1)" class="quantity-btn">+</button>
+                    </td>
+                    <td class="product-total">${{ quantity[i]*items[i].price }}</td>
+                    <td>
+                        <a href="{{ url_for('remove', id=items[i].id, quantity=quantity[i]) }}">
+                            <button class="remove-from-cart"> Remove </button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     {% endif %}
 
     {% if price %}
@@ -103,9 +106,10 @@
 
 <style>
     .cart-table {
-        width: 100%;
+        width: 85%;
         border-collapse: collapse;
         margin-top: 20px;
+        align-items: center;
     }
 
     .cart-table th, .cart-table td {
@@ -331,5 +335,8 @@
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
+.cart-table td {
+        vertical-align: middle; /* Đảm bảo các ô dữ liệu nằm giữa theo chiều dọc */
+    }
 </style>
 {% endblock %}

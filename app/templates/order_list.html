@@ -1,0 +1,43 @@
+{%block order_list%}
+<div class ="table-container" style="width:100%;display:flex;justify-content: center;">
+<table class="order-table table-striped">
+    <tr>
+        <th>Order ID</th>
+        <th>Order Date</th>
+        <th>Ordered Items</th>
+        <th>Order Status</th>
+    </tr>
+    {% for order in processing_orders or shipped_orders or delivered_orders or cancelled_orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+                {% for i in order.items %}
+                    <a href="{{ url_for('item', id=i.item.id) }}">{{ i.item.name }}</a> x <span class="success">{{ i.quantity }}</span><br>
+                {% endfor %}
+            </td>
+            <td>{{ order.status }}</td>
+        </tr>
+    {% endfor %}
+</table>
+</div>
+<style>
+      .order-table {
+        width: 85%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        align-items: center;
+    }
+
+    .order-table th, .order-table td {
+        text-align: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .order-table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+</style>
+{%endblock%}
