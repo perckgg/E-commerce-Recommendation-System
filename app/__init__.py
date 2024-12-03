@@ -1,5 +1,5 @@
 import os, stripe, json
-from flask import Flask, request, render_template,redirect, url_for, flash, request, abort,session
+from flask import Flask, request, render_template,redirect, url_for, flash, request, abort,session,jsonify
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -21,6 +21,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 import uuid
+
 
 # load files===========================================================================================================
 # trending_products = pd.read_csv("app/models/trending_products.csv")
@@ -151,7 +152,21 @@ def search():
 
     # Hiển thị kết quả tìm kiếm
     return render_template('home.html', items=items, search=True, query=query)
+@app.route('/autocomplete')
+def autocomplete():
+    query = request.args.get('query', '').strip()
+    if not query:
+        return jsonify([])
 
+    # Tìm sản phẩm bắt đầu với từ khóa
+    search = f"{query}%"
+    items = Item.query.filter(Item.name.ilike(search)).limit(10).all()
+    for item in items:
+        print("img",item.image)
+    # Chuyển đổi kết quả sang JSON
+    results = [{'id': item.id, 'name': item.name,'image_url': item.image} for item in items]
+
+    return jsonify(results)
 @app.route("/register", methods=['POST', 'GET'])
 def register():
 	if current_user.is_authenticated:

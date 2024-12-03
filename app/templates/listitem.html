@@ -1,44 +1,52 @@
-
 {% block listitem %}
-<div class="items">
-    {% for item in items %}
-    <a href="{{ url_for('item', id=item.id) }}">
-        <div class="item">
-            <div class="item-wrapper">
-                <div class="img-wrapper">
-                    <img src="{{ item.image }}" class="pic">
+<div class="carousel-container">
+    <button class="carousel-btn prev-btn"><i class="fa-solid fa-chevron-left"></i></button> <!-- Nút tua lại -->
+    <div class="carousel">
+        <div class="carousel-wrapper">
+            {% for item in items %}
+            <a href="{{ url_for('item', id=item.id) }}">
+                <div class="item">
+                    <div class="item-wrapper">
+                        <div class="img-wrapper">
+                            <img src="{{ item.image }}" class="pic">
+                        </div>
+                        <div class="item-info">
+                            <!-- Tên sản phẩm, giới hạn dòng hiển thị -->
+                            <div class="item-name" title="{{ item.name }}">{{ item.name }}</div>
+
+                            <!-- Hiển thị sao -->
+                            <div class="rating">
+                                {% set full_stars = item.rating|int %}
+                                {% set half_star = 1 if (item.rating - full_stars) >= 0.5 else 0 %}
+                                {% set empty_stars = 5 - full_stars - half_star %}
+
+                                {% for _ in range(full_stars) %}
+                                <i class="fa fa-star checked"></i>
+                                {% endfor %}
+                                {% if half_star %}
+                                <i class="fa fa-star-half-o checked"></i>
+                                {% endif %}
+                                {% for _ in range(empty_stars) %}
+                                <i class="fa fa-star-o"></i>
+                                {% endfor %}
+                                <span class="text-muted">({{ item.rating_count if item.rating_count else 0 }})</span>
+                            </div>
+                            
+
+                            <!-- Giá sản phẩm -->
+                            <div class="item-price">${{ item.price }}</div>
+                        </div>
+                    </div>
                 </div>
-                {{ item.name }}
-                <span class="right-item">${{ item.price }}</span><br>
-
-                <!-- Hiển thị sao -->
-                <div class="rating">
-                    {% set full_stars = item.rating|int %}  <!-- Số sao vàng -->
-                    {% set half_star = 1 if (item.rating - full_stars) >= 0.5 else 0 %}  <!-- Sao nửa -->
-                    {% set empty_stars = 5 - full_stars - half_star %}  <!-- Sao không có màu -->
-
-                    <!-- Sao đầy -->
-                    {% for _ in range(full_stars) %}
-                    <i class="fa fa-star checked"></i>
-                    {% endfor %}
-
-                    <!-- Sao nửa -->
-                    {% if half_star %}
-                    <i class="fa fa-star-half-o checked"></i>
-                    {% endif %}
-
-                    <!-- Sao rỗng -->
-                    {% for _ in range(empty_stars) %}
-                    <i class="fa fa-star-o"></i>
-                    {% endfor %}
-                </div>
-                <span class="text-muted">({{ item.rating_count if item.rating_count else 0 }})</span>
-            </div>
+            </a>
+            {% endfor %}
         </div>
-    </a>
-    {% endfor %}
+    </div>
+    <button class="carousel-btn next-btn"><i class="fa-solid fa-chevron-right"></i></button> <!-- Nút tiến -->
 </div>
+
 <style>
+    /* Ngôi sao */
     .checked {
         color: gold; /* Ngôi sao vàng */
     }
@@ -50,5 +58,115 @@
     .fa-star-half-o {
         color: gold; /* Ngôi sao vàng nửa */
     }
+
+    /* Carousel */
+    .carousel-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .carousel {
+        display: flex;
+        scroll-behavior: smooth; /* Cuộn mượt */
+        overflow-x: scroll; /* Vẫn cho phép cuộn ngang nhưng không hiển thị thanh cuộn */
+        scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+    }
+    .carousel::-webkit-scrollbar {
+        display: none; /* Ẩn thanh cuộn trên Chrome, Edge */
+    }
+
+    .carousel-wrapper {
+        display: flex;
+        gap: 20px;
+    }
+
+    .item {
+        flex: 0 0 auto; /* Đảm bảo mỗi sản phẩm không co giãn */
+        width: 250px; /* Chiều rộng cố định cho sản phẩm */
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: left;
+    }
+
+    .img-wrapper {
+        height: 150px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pic {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    /* Tên sản phẩm, giới hạn dòng */
+    .item-name {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        line-height: 1.4;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Giá */
+    .item-price {
+        font-size: 18px;
+        font-weight: bold;
+        color: #FF728F;
+        margin-top: 5px;
+    }
+
+    /* Nút carousel */
+    .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: white;
+        color: #FF728F;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    .prev-btn {
+        left: 10px;
+    }
+
+    .next-btn {
+        right: 10px;
+    }
 </style>
+
+<script>
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const carousel = document.querySelector('.carousel');
+
+    // Kéo carousel sang trái
+    prevBtn.addEventListener('click', () => {
+        carousel.scrollBy({
+            left: -carousel.offsetWidth, // Kéo ngược chiều ngang
+            behavior: 'smooth'
+        });
+    });
+
+    // Kéo carousel sang phải
+    nextBtn.addEventListener('click', () => {
+        carousel.scrollBy({
+            left: carousel.offsetWidth, // Kéo cùng chiều ngang
+            behavior: 'smooth'
+        });
+    });
+</script>
 {% endblock %}
