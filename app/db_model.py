@@ -88,3 +88,8 @@ class Comment(db.Model):
     def __repr__(self):
         return f"<Comment {self.content[:20]} by User {self.user_id}>"
     
+class Category(db.Model):
+    __tablename__ = "category"
+    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    main_category = db.Column(db.String(250),nullable=False)
+    sub_category = db.Column(db.String(250), nullable=False)
