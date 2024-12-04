@@ -34,7 +34,11 @@
                             
 
                             <!-- Giá sản phẩm -->
-                            <div class="item-price">${{ item.price }}</div>
+                            <div class="item-discount" id ="item-discount">${{item.discount}}</div>
+                            <div class="price-info" style ="display: flex;align-items: center; gap:10px;">
+                                <span class="discount-percent" id="discount-percent"></span>
+                                <div class="item-price" id = "item-price">${{ item.price }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -117,12 +121,24 @@
 
     /* Giá */
     .item-price {
+        font-size: 14px;
+        font-weight: bold;
+        color: gray;
+        margin-top: 5px;
+        text-decoration: line-through;
+    }
+    .item-discount {
         font-size: 18px;
         font-weight: bold;
         color: #FF728F;
         margin-top: 5px;
+        margin-bottom: 5px;
     }
-
+    .discount-percent {
+        font-size: 16px;
+        font-weight: bold;
+        color: black;
+    }
     /* Nút carousel */
     .carousel-btn {
         position: absolute;
@@ -168,5 +184,21 @@
             behavior: 'smooth'
         });
     });
+</script>
+<script>
+    document.querySelectorAll(".item").forEach(item => {
+    const originalPriceElement = item.querySelector(".item-price");
+    const discountPriceElement = item.querySelector(".item-discount");
+    if (originalPriceElement && discountPriceElement) {
+        const originalPrice = parseInt(originalPriceElement.textContent.replace(/\D/g, ""));
+        const discountPrice = parseInt(discountPriceElement.textContent.replace(/\D/g, ""));
+
+        if (originalPrice && discountPrice && originalPrice > discountPrice) {
+            const discountPercent = Math.floor(((originalPrice - discountPrice) / originalPrice) * 100); // Làm tròn xuống
+            const discountPercentElement = item.querySelector(".discount-percent");
+            discountPercentElement.textContent = `-${discountPercent}%`;
+        }
+    }
+});
 </script>
 {% endblock %}

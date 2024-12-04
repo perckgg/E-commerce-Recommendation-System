@@ -128,13 +128,16 @@ def google_login():
 @app.route('/search')
 def search():
     query = request.args.get('query', '').strip()  # Lấy từ khóa và loại bỏ khoảng trắng thừa
-    if not query:  # Nếu không có từ khóa, trả về tất cả sản phẩm
+    page = request.args.get('page', 1, type=int)  # Trang hiện tại, mặc định là 1
+    per_page = 16  # Số lượng sản phẩm mỗi trang
+
+    if not query:  # Nếu không có từ khóa, trả về thông báo
         flash("Please enter a keyword to search.", "info")
         return redirect(url_for('home'))
 
     # Tìm kiếm sản phẩm theo từ khóa
     search = f"%{query}%"
-    items = (
+    items_query = (
         Item.query.filter(
             db.or_(
                 Item.name.ilike(search),
@@ -142,16 +145,29 @@ def search():
             )
         )
         .order_by(Item.rating.desc(), Item.rating_count.desc())
+    )
+
+    # Tổng số sản phẩm và số trang
+    total_items = items_query.count()
+    total_pages = (total_items + per_page - 1) // per_page
+
+    # Lấy sản phẩm cho trang hiện tại
+    items = (
+        items_query
+        .offset((page - 1) * per_page)
+        .limit(per_page)
         .all()
     )
 
-    # Nếu không tìm thấy kết quả
-    if not items:
-        flash("No products found for your search. Try another keyword.", "warning")
-        items = Item.query.order_by(Item.rating.desc(), Item.rating_count.desc()).limit(10).all()
-
     # Hiển thị kết quả tìm kiếm
-    return render_template('home.html', items=items, search=True, query=query)
+    return render_template(
+        "search_result.html",
+        items=items,
+        query=query,
+        current_page=page,
+        total_pages=total_pages
+    )
+
 @app.route('/autocomplete')
 def autocomplete():
     query = request.args.get('query', '').strip()
@@ -161,8 +177,6 @@ def autocomplete():
     # Tìm sản phẩm bắt đầu với từ khóa
     search = f"{query}%"
     items = Item.query.filter(Item.name.ilike(search)).limit(10).all()
-    for item in items:
-        print("img",item.image)
     # Chuyển đổi kết quả sang JSON
     results = [{'id': item.id, 'name': item.name,'image_url': item.image} for item in items]
 

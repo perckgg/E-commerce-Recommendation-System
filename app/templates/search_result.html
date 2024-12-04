@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}
+Search Results - Olist-Ecom
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% with msgs = get_flashed_messages(with_categories=True) %}
+    {% for c, msg in msgs %}
+    {% if c == 'error' %}
+    <div class="flash-error">
+        {% else %}
+        <div class="success">
+            {% endif %}
+            {{ msg | safe }}</div><br>
+        {% endfor %}
+        {% endwith %}
+        
+    <h3>Search results for "{{ query }}":</h3>
+
+    {% if not items %}
+    <div class="flash-error">
+        No items found.<br>
+        <a href="{{ url_for('home') }}">Discover new items</a>
+    </div>
+    {% else %}
+    <div class="product-grid">
+        {% for item in items %}
+		<a href="{{ url_for('item', id=item.id) }}">
+			<div class="item">
+				<div class="item-wrapper">
+					<div class="img-wrapper">
+						<img src="{{ item.image }}"  width="200px" height="200px">
+					</div>
+					<div class="item-info">
+						<!-- Tên sản phẩm, giới hạn dòng hiển thị -->
+						<div class="item-name" title="{{ item.name }}">{{ item.name }}</div>
+
+						<!-- Hiển thị sao -->
+						<div class="rating">
+							{% set full_stars = item.rating|int %}
+							{% set half_star = 1 if (item.rating - full_stars) >= 0.5 else 0 %}
+							{% set empty_stars = 5 - full_stars - half_star %}
+
+							{% for _ in range(full_stars) %}
+							<i class="fa fa-star checked"></i>
+							{% endfor %}
+							{% if half_star %}
+							<i class="fa fa-star-half-o checked"></i>
+							{% endif %}
+							{% for _ in range(empty_stars) %}
+							<i class="fa fa-star-o"></i>
+							{% endfor %}
+							<span class="text-muted">({{ item.rating_count if item.rating_count else 0 }})</span>
+						</div>
+						
+
+						<!-- Giá sản phẩm -->
+						<div class="item-price">${{ item.price }}</div>
+					</div>
+				</div>
+			</div>
+		</a>
+        {% endfor %}
+    </div>
+
+    <div class="pagination">
+        {% if current_page > 1 %}
+        <a href="{{ url_for('search', query=query, page=current_page - 1) }}">Previous</a>
+        {% endif %}
+        {% for p in range(1, total_pages + 1) %}
+        <a href="{{ url_for('search', query=query, page=p) }}" class="{% if p == current_page %}active{% endif %}">
+            {{ p }}
+        </a>
+        {% endfor %}
+        {% if current_page < total_pages %}
+        <a href="{{ url_for('search', query=query, page=current_page + 1) }}">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+<style>
+	.container {
+    max-width: 1400px;
+    margin: auto;
+    padding: 20px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(331px, 1fr));
+    gap: 10px;
+}
+
+.item {
+        flex: 0 0 auto; /* Đảm bảo mỗi sản phẩm không co giãn */
+        width: 300px; /* Chiều rộng cố định cho sản phẩm */
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: left;
+}
+
+.img-wrapper {
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+.pic {
+        max-width: 250px;
+        max-height: 250px;
+        object-fit: contain;
+}
+
+/* Tên sản phẩm, giới hạn dòng */
+.item-name {
+	font-size: 16px;
+	font-weight: bold;
+	color: #333;
+	line-height: 1.4;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Giá */
+.item-price {
+	font-size: 18px;
+	font-weight: bold;
+	color: #FF728F;
+	margin-top: 5px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pagination a.active {
+    background-color: #FF728F;
+    color: white;
+    border-color: #ffffff;
+}
+
+.pagination a:hover {
+    background-color: #f992a7;
+}
+.checked {
+        color: gold; /* Ngôi sao vàng */
+    }
+
+    .fa-star-o {
+        color: #ddd; /* Sao viền xám (trống) */
+    }
+
+    .fa-star-half-o {
+        color: gold; /* Ngôi sao vàng nửa */
+    }
+</style>
+{% endblock %}

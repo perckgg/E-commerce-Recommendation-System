@@ -25,7 +25,7 @@
 
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white">
     <a class="navbar-brand" href="{{ url_for('home') }}"><img src="../static/img/logo.png"
         alt="Ecom-Olist"></img>Ecom-Olist</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -39,7 +39,7 @@
       <style>
         .iconsearch {
           display: flex;
-          height: 35px;
+          height: 40px;
           background-color: #FF728F;
           width: 35px;
           justify-content: center;
@@ -64,7 +64,7 @@
       </style>
       <!-- Input tìm kiếm -->
       <input type="search" id="search-input" placeholder="Search for ..." class="inputsearch" name="query"
-        style="padding-left:5px;height: 35px; border-radius: 15px 0 0 15px; background-color: rgb(238, 238, 238); outline: none; border: none; max-width: 300px; width: 80%;">
+        style="padding-left:10px;height: 40px; border-radius: 15px 0 0 15px; background-color: rgb(238, 238, 238); outline: none; border: none; ; width: 600px;">
       <!-- Nút submit chứa biểu tượng -->
       <button class="iconsearch" type="submit">
         <i class="fas fa-search" style="color: white;"></i>
@@ -232,7 +232,7 @@
     </div>
   </nav>
 
-  <div class="main" style="background-color: rgb(237, 232, 232);">
+  <div class="main" style="background-color: rgb(245, 245, 245);">
     {% block content %}
     {% endblock %}
   </div>

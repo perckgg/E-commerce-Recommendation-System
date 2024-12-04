@@ -64,6 +64,35 @@ Home - Olist-Ecom
 			top: 10px;
 			/* Adjusted to add a margin from the top */
 		}
+		/* Banner quảng cáo */
+.banner-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    height: 400px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.banner-slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.banner-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.banner-slide.active {
+    opacity: 1;
+}
 	</style>
 	<script>
 		window.addEventListener('scroll', function () {
@@ -102,6 +131,7 @@ Home - Olist-Ecom
 		// Call the function to set the image src
 		setImageSrc();
 	</script>
+	
 	<div style="display:flex; flex-direction: row; gap: 20px; margin: 20px;">
 		<!-- Sidebar -->
 		<div class="sidebar"
@@ -145,6 +175,22 @@ Home - Olist-Ecom
 		</div>
 		<!-- Content -->
 		<div class="content" style="flex-grow: 1; display: flex; flex-direction: column; gap: 20px;">
+			<!-- Banner quảng cáo -->
+			<div class="banner-container" style="margin-bottom: 20px;">
+				<div class="banner-slide">
+					<img src="../static/img/xmas.jpg" alt="Banner 1">
+				</div>
+				<div class="banner-slide">
+					<img src="../static/img/sale.jpg" alt="Banner 2">
+				</div>
+				<div class="banner-slide">
+					<img src="../static/img/off.jpg" alt="Banner 3">
+				</div>
+				<div class="banner-slide">
+					<img src="../static/img/electronic.jpg" alt="Banner 4">
+				</div>
+			</div>
+		
 			<!-- New Arrivals -->
 			<div class="items-container" style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
 				<h3>New Arrivals</h3>
@@ -152,7 +198,7 @@ Home - Olist-Ecom
 					{% include 'listitem.html' %}
 				</div>
 			</div>
-	
+		
 			<!-- Most Popular -->
 			<div class="items-container" style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
 				<h3>Most Popular</h3>
@@ -161,6 +207,29 @@ Home - Olist-Ecom
 				</div>
 			</div>
 		</div>
+	<script>
+				// Lấy tất cả các slide trong container
+		const slides = document.querySelectorAll('.banner-slide');
+		let currentIndex = 0;
+
+		// Hàm chuyển slide
+		function showNextSlide() {
+			// Ẩn slide hiện tại
+			slides[currentIndex].classList.remove('active');
+
+			// Tăng chỉ số
+			currentIndex = (currentIndex + 1) % slides.length;
+
+			// Hiển thị slide mới
+			slides[currentIndex].classList.add('active');
+		}
+
+		setInterval(showNextSlide, 3000);
+
+		// Kích hoạt slide đầu tiên
+		slides[currentIndex].classList.add('active');
+
+	</script>
 	</div>
 	{% endif %}
 	{% if not items %}
