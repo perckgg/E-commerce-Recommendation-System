@@ -6,7 +6,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Message
 from .form import LoginForm, RegisterForm,RequestResetForm,ResetPasswordForm
-from .db_model import  db,User, Item,Comment
+from .db_model import  db,User, Item,Comment,Category
 from .funcs import mail, send_confirmation_email, fulfill_order
 from dotenv import load_dotenv
 from .admin.route import admin
@@ -73,8 +73,9 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 @app.route("/")
 def home():
-	items = Item.query.all()
-	return render_template("home.html", items=items)
+    cats = Category.query.all()
+    items = Item.query.all()
+    return render_template("home.html", items=items,cats = cats)
 
 @app.route("/login", methods=['POST', 'GET'])
 def login():
@@ -167,6 +168,27 @@ def search():
         current_page=page,
         total_pages=total_pages
     )
+
+@app.route('/category')
+def search_by_category():
+    cats = Category.query.all()
+    category = request.args.get('name','').strip()
+    limit = request.args.get('limit',10,type=int)
+    if not category:  # Nếu không có từ khóa, trả về tất cả sản phẩm
+        flash("Please enter a keyword to search.", "info")
+        return redirect(url_for('home'))
+    cat = f"%{category}%"
+    items = (
+        Item.query.filter(Item.category.ilike(cat))  # Filter by category
+        .order_by(Item.rating_count.desc())  # Sort by rating_count descending
+        .limit(limit)  # Limit the number of results
+        .all()  # Fetch the results
+    )
+    print([item.name for item in items])
+    if not items:
+        items = Item.query.order_by(Item.rating.desc(), Item.rating_count.desc()).limit(10).all()
+
+    return render_template('home.html', items=items, category=True,name=category,cats=cats)
 
 @app.route('/autocomplete')
 def autocomplete():
