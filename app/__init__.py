@@ -73,7 +73,12 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 @app.route("/")
 def home():
-    cats = Category.query.all()
+    cats = (
+    Category.query.with_entities(Category.main_category)
+    .distinct()
+    .order_by(Category.main_category.asc())
+    .all()
+)
     items = Item.query.all()
     return render_template("home.html", items=items,cats = cats)
 
@@ -184,7 +189,6 @@ def search_by_category():
         .limit(limit)  # Limit the number of results
         .all()  # Fetch the results
     )
-    print([item.name for item in items])
     if not items:
         items = Item.query.order_by(Item.rating.desc(), Item.rating_count.desc()).limit(10).all()
 

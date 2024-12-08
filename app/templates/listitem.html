@@ -139,7 +139,7 @@
         font-weight: bold;
         color: black;
     }
-    /* Nút carousel */
+ 
     .carousel-btn {
         position: absolute;
         top: 50%;
@@ -153,7 +153,13 @@
         font-size: 20px;
         cursor: pointer;
         z-index: 1;
+        outline:none ;
     }
+    .carousel-btn:focus,
+.carousel-btn:active {
+    outline: none; /* Đảm bảo không có viền khi nhấn hoặc lấy tiêu điểm */
+    border: none;  /* Đảm bảo không có border */
+}
 
     .prev-btn {
         left: 10px;
@@ -164,27 +170,7 @@
     }
 </style>
 
-<script>
-    const prevBtn = document.querySelector('.prev-btn');
-    const nextBtn = document.querySelector('.next-btn');
-    const carousel = document.querySelector('.carousel');
 
-    // Kéo carousel sang trái
-    prevBtn.addEventListener('click', () => {
-        carousel.scrollBy({
-            left: -carousel.offsetWidth, // Kéo ngược chiều ngang
-            behavior: 'smooth'
-        });
-    });
-
-    // Kéo carousel sang phải
-    nextBtn.addEventListener('click', () => {
-        carousel.scrollBy({
-            left: carousel.offsetWidth, // Kéo cùng chiều ngang
-            behavior: 'smooth'
-        });
-    });
-</script>
 <script>
     document.querySelectorAll(".item").forEach(item => {
     const originalPriceElement = item.querySelector(".item-price");
