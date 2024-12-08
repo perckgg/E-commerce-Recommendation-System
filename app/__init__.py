@@ -1,4 +1,4 @@
-import os, stripe, json
+import os, json
 from flask import Flask, request, render_template,redirect, url_for, flash, request, abort,session,jsonify
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 from .admin.route import admin
 from itsdangerous import URLSafeTimedSerializer,SignatureExpired, BadSignature
 from sqlalchemy import func
-import secrets
 import pandas as pd
 import random
 from flask_sqlalchemy import SQLAlchemy
@@ -22,6 +21,29 @@ from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 import uuid
 
+from sentence_transformers import SentenceTransformer
+import numpy as np
+import faiss
+model = SentenceTransformer('all-MiniLM-L6-v2')
+index = faiss.read_index("app/models/large_index.ivf")
+with open('app/models/product_name.json', 'r') as json_file:
+    product_name = json.load(json_file)
+def get_recommend_item(model, query, index, top_item):
+    if not query.strip():
+        raise ValueError("Query cannot be empty")
+
+    try:
+        # Encode query
+        query_embedding = model.encode([query]).astype('float32')
+
+        # Perform FAISS search
+        distances, indices = index.search(query_embedding, top_item)
+
+        # Map indices to product names
+        recommended_names = [product_name[idx] for idx in indices[0] if idx < len(product_name)]
+        return recommended_names
+    except Exception as e:
+        raise RuntimeError(f"Error during recommendation: {e}")
 
 # load files===========================================================================================================
 # trending_products = pd.read_csv("app/models/trending_products.csv")
@@ -47,7 +69,6 @@ app.config['MAIL_PASSWORD'] = os.environ["PASSWORD"]
 app.config['MAIL_SERVER'] = "smtp.googlemail.com"
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_PORT'] = 587
-stripe.api_key = os.environ["STRIPE_PRIVATE"]
 app.config['SECURITY_PASSWORD_SALT'] = os.getenv("SECURITY_PASSWORD_SALT")
 
 # db = SQLAlchemy(app)
