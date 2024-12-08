@@ -219,11 +219,29 @@ def autocomplete():
 
     # Tìm sản phẩm bắt đầu với từ khóa
     search = f"{query}%"
-    items = Item.query.filter(Item.name.ilike(search)).limit(10).all()
-    # Chuyển đổi kết quả sang JSON
-    results = [{'id': item.id, 'name': item.name,'image_url': item.image} for item in items]
+    items = Item.query.filter(Item.name.ilike(search)).limit(5).all()
+    main_categories = (
+        Category.query.with_entities(Category.main_category)
+        .filter(Category.main_category.ilike(search))
+        .distinct()
+        .limit(5)
+        .all()
+    )
+    sub_categories = (
+        Category.query.with_entities(Category.sub_category)
+        .filter(Category.sub_category.ilike(search))
+        .distinct()
+        .limit(5)
+        .all()
+    )
 
+    # Chuyển đổi kết quả sang JSON
+    results = []
+    results.extend([{'type': 'item', 'id': item.id, 'name': item.name, 'image_url': item.image} for item in items])
+    results.extend([{'type': 'category', 'name': category.main_category, 'id': None, 'image_url': None} for category in main_categories])
+    results.extend([{'type': 'category', 'name': category.sub_category, 'id': None, 'image_url': None} for category in sub_categories])
     return jsonify(results)
+
 @app.route("/register", methods=['POST', 'GET'])
 def register():
 	if current_user.is_authenticated:

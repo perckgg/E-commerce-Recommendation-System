@@ -63,7 +63,7 @@
         
       </style>
       <!-- Input tìm kiếm -->
-      <input type="search" id="search-input" placeholder="Search for ..." class="inputsearch" name="query"
+      <input type="search" id="search-input" placeholder="Search for ..." class="inputsearch" name="query"  autocomplete="off"
         style="padding-left:10px;height: 40px; border-radius: 15px 0 0 15px; background-color: rgb(238, 238, 238); outline: none; border: none; ; width: 600px;">
       <!-- Nút submit chứa biểu tượng -->
       <button class="iconsearch" type="submit">
@@ -72,7 +72,7 @@
       <ul id="autocomplete-list" style="
         position: absolute;
         top: 100%;
-        left: 40%;
+        left: 28%;
         right: 0;
         background-color: white;
         border-radius: 1px solid #ccc;
@@ -81,7 +81,7 @@
         list-style: none;
         margin: 0;
         padding: 0;
-        width: 300px;
+        width: 600px;
         flex-grow: 1;
     ">
     </ul>
@@ -91,21 +91,21 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('search-input');
-    const autocompleteList = document.getElementById('autocomplete-list'); // Lấy danh sách autocomplete
+    const autocompleteList = document.getElementById('autocomplete-list');
 
     if (searchInput) {
         searchInput.addEventListener('input', async function () {
             const query = this.value.trim();
 
             if (query.length === 0) {
-                autocompleteList.style.display = 'none'; // Sử dụng biến đã khai báo
+                autocompleteList.style.display = 'none';
                 return;
             }
 
             fetch(`/autocomplete?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
-                    autocompleteList.innerHTML = ''; // Làm trống danh sách
+                    autocompleteList.innerHTML = '';
 
                     if (data.length === 0) {
                         autocompleteList.style.display = 'none';
@@ -114,52 +114,57 @@
 
                     data.forEach(item => {
                         const li = document.createElement('li');
-                       
-                        // Thêm ảnh nếu có
-                        if (item.image_url) {
+                        li.style.display = 'flex';
+                        li.style.alignItems = 'center';
+
+                        if (item.type === 'item' && item.image_url) {
+                            // Hiển thị hình ảnh cho sản phẩm
                             const img = document.createElement('img');
                             img.src = item.image_url;
                             img.alt = 'Product Image';
-                            img.style.width = '50px'; // Tuỳ chỉnh kích thước
+                            img.style.width = '50px';
                             img.style.marginRight = '10px';
                             li.appendChild(img);
-                        } else {
-                            // Hoặc thêm icon thay thế
-                            const placeholder = document.createElement('div');
-                            placeholder.className = 'placeholder-icon';
-                            placeholder.innerHTML = '<i class="fas fa-search"></i>';
-                            li.appendChild(placeholder);
+                        } else if (item.type === 'category') {
+                            // Hiển thị icon cho category
+                            const icon = document.createElement('i');
+                            icon.className = 'fas fa-search';
+                            icon.style.marginRight = '10px';
+                            li.appendChild(icon);
                         }
 
-                        // Thêm tên sản phẩm
+                        // Thêm tên
                         const span = document.createElement('span');
                         span.textContent = item.name;
                         li.appendChild(span);
 
                         li.addEventListener('click', () => {
-                            searchInput.value = item.name; // Điền tên vào input
+                            searchInput.value = item.name;
                             autocompleteList.style.display = 'none';
-                            window.location.href = `/search?query=${encodeURIComponent(item.name)}`; // Điều hướng
+
+                            if (item.type === 'item') {
+                                window.location.href = `/search?query=${encodeURIComponent(item.name)}`;
+                            } else if (item.type === 'category') {
+                                window.location.href = `/category?name=${encodeURIComponent(item.name)}`;
+                            }
                         });
 
                         autocompleteList.appendChild(li);
                     });
 
-                    autocompleteList.style.display = 'block'; // Hiển thị danh sách
+                    autocompleteList.style.display = 'block';
                 })
                 .catch(error => console.error('Error:', error));
         });
-    } else {
-        console.error('Element with id "search-input" not found');
     }
 
-    // Ẩn danh sách khi nhấp ra ngoài
     document.addEventListener('click', function (e) {
         if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
             autocompleteList.style.display = 'none';
         }
     });
 });
+
 
   </script>
     <style>

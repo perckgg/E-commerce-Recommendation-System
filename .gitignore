@@ -4,3 +4,5 @@ __pycache__
 data
 pythonenv
 Process/my_model.h5
+model
+Process/text-simalarity.ipynb
