@@ -73,14 +73,31 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 @app.route("/")
 def home():
+    # Danh mục chính
     cats = (
-    Category.query.with_entities(Category.main_category)
-    .distinct()
-    .order_by(Category.main_category.asc())
-    .all()
-)
+        Category.query.with_entities(Category.main_category)
+        .distinct()
+        .order_by(Category.main_category.asc())
+        .all()
+    )
+
+    # Danh sách sản phẩm gốc
     items = Item.query.all()
-    return render_template("home.html", items=items,cats = cats)
+
+    # Danh sách sản phẩm theo giá tăng dần
+    items_by_price = Item.query.order_by(Item.price.asc()).all()
+
+    # Danh sách sản phẩm theo tên (alphabet)
+    items_by_name = Item.query.order_by(Item.name.asc()).all()
+
+    return render_template(
+        "home.html", 
+        items=items, 
+        items_by_price=items_by_price, 
+        items_by_name=items_by_name, 
+        cats=cats
+    )
+
 
 @app.route("/login", methods=['POST', 'GET'])
 def login():
@@ -291,9 +308,16 @@ def remove(id, quantity):
 
 @app.route('/item/<int:id>')
 def item(id):
-	item = Item.query.get(id)
-	comment = Comment.query.filter_by(item_id = id).order_by(Comment.created_at.desc()).all
-	return render_template('item.html', item=item,comment=comment)
+    item = Item.query.get(id)
+    comment = Comment.query.filter_by(item_id = id).order_by(Comment.created_at.desc()).all()
+    items_by_price = Item.query.order_by(Item.price.asc()).all()
+    items_by_name = Item.query.order_by(Item.name.asc()).all()
+    return render_template(
+    'item.html', item=item,
+    comment=comment,
+    items_by_name=items_by_name,
+    items_by_price=items_by_price
+    )
 
 # stripe stuffs
 @app.route('/payment_success')

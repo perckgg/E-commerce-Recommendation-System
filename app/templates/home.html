@@ -169,7 +169,7 @@ Home - Olist-Ecom
 				<h3>{{name}}</h3>
 				<div class="items-grid"
 					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
-					{% include 'listitem.html' %}
+					{% include 'listitem_in_item.html' %}
 				</div>
 			</div>
 
@@ -180,7 +180,9 @@ Home - Olist-Ecom
 				<h3>New Arrivals</h3>
 				<div class="items-grid"
 					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
-					{% include 'listitem.html' %}
+					{% with items=items_by_price %}
+						{% include 'listitem.html' %}
+					{% endwith %}
 				</div>
 			</div>
 
@@ -190,7 +192,9 @@ Home - Olist-Ecom
 				<h3>Most Popular</h3>
 				<div class="items-grid"
 					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
-					{% include 'listitem.html' %}
+					{% with items=items_by_name %}
+						{% include 'listitem.html' %}
+					{% endwith %}
 				</div>
 			</div>
 			{% endif %}
@@ -218,32 +222,7 @@ Home - Olist-Ecom
 			slides[currentIndex].classList.add('active');
 
 		</script>
-		<script>
-			document.addEventListener('DOMContentLoaded', () => {
-			const carousels = document.querySelectorAll('.carousel-container');
-
-			carousels.forEach(container => {
-				const prevBtn = container.querySelector('.prev-btn');
-				const nextBtn = container.querySelector('.next-btn');
-				const carousel = container.querySelector('.carousel');
-
-				prevBtn.addEventListener('click', () => {
-					carousel.scrollBy({
-						left: -carousel.offsetWidth, 
-						behavior: 'smooth'
-					});
-				});
-
-	
-				nextBtn.addEventListener('click', () => {
-					carousel.scrollBy({
-						left: carousel.offsetWidth, 
-						behavior: 'smooth'
-					});
-				});
-			});
-			});
-		</script>
+		
 	</div>
 	{% if not items %}
 	<div class="flash-error">
