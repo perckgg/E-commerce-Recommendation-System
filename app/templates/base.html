@@ -88,26 +88,27 @@
     </form>
     <!-- Dropdown list for suggestions -->
     
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('search-input');
+    const autocompleteList = document.getElementById('autocomplete-list'); // Lấy danh sách autocomplete
+
     if (searchInput) {
         searchInput.addEventListener('input', async function () {
             const query = this.value.trim();
 
             if (query.length === 0) {
-                document.getElementById('autocomplete-list').style.display = 'none';
+                autocompleteList.style.display = 'none'; // Sử dụng biến đã khai báo
                 return;
             }
 
             fetch(`/autocomplete?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
-                    const list = document.getElementById('autocomplete-list');
-                    list.innerHTML = '';
+                    autocompleteList.innerHTML = ''; // Làm trống danh sách
 
                     if (data.length === 0) {
-                        list.style.display = 'none';
+                        autocompleteList.style.display = 'none';
                         return;
                     }
 
@@ -118,6 +119,9 @@
                         if (item.image_url) {
                             const img = document.createElement('img');
                             img.src = item.image_url;
+                            img.alt = 'Product Image';
+                            img.style.width = '50px'; // Tuỳ chỉnh kích thước
+                            img.style.marginRight = '10px';
                             li.appendChild(img);
                         } else {
                             // Hoặc thêm icon thay thế
@@ -133,28 +137,30 @@
                         li.appendChild(span);
 
                         li.addEventListener('click', () => {
-                            document.getElementById('search-input').value = item.name;
-                            list.style.display = 'none';
+                            searchInput.value = item.name; // Điền tên vào input
+                            autocompleteList.style.display = 'none';
+                            window.location.href = `/search?query=${encodeURIComponent(item.name)}`; // Điều hướng
                         });
-                        li.addEventListener('click', () => {
-                            window.location.href = `/search?query=${encodeURIComponent(item.name)}`;
-                        });
-                        list.appendChild(li);
+
+                        autocompleteList.appendChild(li);
                     });
 
-                    list.style.display = 'block';
+                    autocompleteList.style.display = 'block'; // Hiển thị danh sách
                 })
                 .catch(error => console.error('Error:', error));
         });
     } else {
         console.error('Element with id "search-input" not found');
     }
+
+    // Ẩn danh sách khi nhấp ra ngoài
     document.addEventListener('click', function (e) {
         if (!autocompleteList.contains(e.target) && e.target !== searchInput) {
             autocompleteList.style.display = 'none';
         }
     });
 });
+
   </script>
     <style>
       #autocomplete-list li {

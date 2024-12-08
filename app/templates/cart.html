@@ -76,14 +76,14 @@
                     <td>{{ items[i].name }}</td>
                     <td>${{ items[i].price }}</td>
                     <td>
-                        <button onclick="updateQuantity({{ i }}, -1)" class="quantity-btn">-</button>
-                        <span id="quantity-{{ i }}">{{ quantity[i] }}</span>
-                        <button onclick="updateQuantity({{ i }}, 1)" class="quantity-btn">+</button>
+                        <button onclick="updateQuantity({{ i }}, -1)" class="quantity-btn"><i class="fa-solid fa-minus" style="height:80%;width:80%"></i></button>
+                        <span id="quantity-{{ i }}" class="quantity-display">{{ quantity[i] }}</span>
+                        <button onclick="updateQuantity({{ i }}, 1)" class="quantity-btn"><i class="fa-solid fa-plus" style="height:80%;width:80%"></i></button>
                     </td>
                     <td class="product-total">${{ quantity[i]*items[i].price }}</td>
                     <td>
                         <a href="{{ url_for('remove', id=items[i].id, quantity=quantity[i]) }}">
-                            <button class="remove-from-cart"> Remove </button>
+                            <button class="remove-from-cart"><i class="fa-solid fa-xmark" style="height:fit-content;width:fit-content"></i></button>
                         </a>
                     </td>
                 </tr>
@@ -132,9 +132,14 @@
         background-color: #e74c3c;
         color: white;
         border: none;
-        padding: 5px 10px;
+        /* padding: 5px 10px; */
         cursor: pointer;
         border-radius: 5px;
+        width: 30px;
+        height: 30px;
+        justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+        align-items: center; /* Căn giữa nội dung theo chiều dọc */
+        
     }
 
     .remove-from-cart:hover {
@@ -142,16 +147,31 @@
     }
 
     .quantity-btn {
-        padding: 5px 10px;
-        background-color: #3498db;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-    }
+    width: 30px;
+    height: 30px; 
+    padding: 0; 
+   
+    justify-content: center; 
+    align-items: center;
+    background-color: #FF728F;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 18px; /* Kích thước font */
+}
+
+.quantity-display {
+    padding: 0 10px;
+    font-size: 16px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 30px;
+}
 
     .quantity-btn:hover {
-        background-color: #2980b9;
+        background-color: #ff6383;
     }
 
     .check {
