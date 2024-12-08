@@ -305,7 +305,7 @@ def cart():
 		items.append(cart.item)
 		quantity.append(cart.quantity)
 		price_id_dict = {
-			"price": cart.item.price_id,
+			"price": cart.item.price,
 			"quantity": cart.quantity,
 			}
 		price_ids.append(price_id_dict)

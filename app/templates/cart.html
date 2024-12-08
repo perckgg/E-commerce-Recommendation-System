@@ -27,12 +27,16 @@
 
     {% if items %}
     <script>
-        // Gọi hàm để gắn sự kiện cho tất cả các checkbox khi tải trang
         window.onload = function () {
-            document.querySelectorAll(".product-check").forEach((checkbox, index) => {
-                checkbox.addEventListener("change", () => {
-                    let minusButton = document.querySelectorAll(".quantity-btn")[index * 2]; // Nút trừ
-                    let plusButton = document.querySelectorAll(".quantity-btn")[index * 2 + 1]; // Nút cộng
+            const productCheckboxes = document.querySelectorAll(".product-check");
+            const quantityButtons = document.querySelectorAll(".quantity-btn");
+            const checkAll = document.getElementById("check-all"); // Checkbox "Check All"
+    
+            // Hàm để cập nhật trạng thái của nút tăng/giảm
+            function updateQuantityButtons() {
+                productCheckboxes.forEach((checkbox, index) => {
+                    let minusButton = quantityButtons[index * 2]; // Nút trừ
+                    let plusButton = quantityButtons[index * 2 + 1]; // Nút cộng
     
                     if (checkbox.checked) {
                         minusButton.disabled = true;
@@ -42,9 +46,31 @@
                         plusButton.disabled = false;
                     }
                 });
+            }
+    
+            // Gắn sự kiện cho từng checkbox
+            productCheckboxes.forEach((checkbox) => {
+                checkbox.addEventListener("change", () => {
+                    updateQuantityButtons();
+    
+                    // Nếu tất cả đều được chọn, "Check All" cũng được chọn
+                    checkAll.checked = Array.from(productCheckboxes).every(cb => cb.checked);
+                });
             });
+    
+            // Gắn sự kiện cho checkbox "Check All"
+            if (checkAll) {
+                checkAll.addEventListener("change", () => {
+                    const isChecked = checkAll.checked;
+                    productCheckboxes.forEach((checkbox) => {
+                        checkbox.checked = isChecked; // Đánh dấu tất cả checkbox
+                    });
+                    updateQuantityButtons(); // Cập nhật trạng thái nút tăng/giảm
+                });
+            }
         };
     </script>
+    
     <div class ="table-container" style="width:100%;display:flex;justify-content: center;">
         <table class="cart-table">
             <thead>
@@ -99,7 +125,7 @@
         <form method="POST" action="{{ url_for('create_checkout_session') }}">
             <input type="hidden" value="{{ price_ids }}" name="price_ids">
             <h3>Grand Total: <span id="grand-total">$0.00</span></h3>
-            <button class="bg-success btn-block btn-primary checkout"> Checkout </button>
+            <button class="bg-success btn-block btn-primary checkout" id="checkout-btn"> Checkout </button>
         </form>
     </div>
     {% endif %}
@@ -287,6 +313,7 @@
     });
 });
 </script>
+
 <style>
     /* Customize the label (the container) */
 .container {

@@ -42,7 +42,7 @@ class Item(db.Model):
     comment_count = db.Column(db.Integer,nullable = True)
     discount = db.Column(db.Float,nullable = True)
     comments = relationship('Comment', back_populates='item')
-    price_id = db.Column(db.String(250), nullable=True)
+    # price_id = db.Column(db.String(250), nullable=True)
     orders = db.relationship("Ordered_item", backref="item")
     in_cart = db.relationship("Cart", backref="item")
     
