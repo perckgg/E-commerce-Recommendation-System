@@ -172,18 +172,38 @@
 
 <script>
     document.querySelectorAll(".item").forEach(item => {
-    const originalPriceElement = item.querySelector(".item-price");
-    const discountPriceElement = item.querySelector(".item-discount");
-    if (originalPriceElement && discountPriceElement) {
-        const originalPrice = parseInt(originalPriceElement.textContent.replace(/\D/g, ""));
-        const discountPrice = parseInt(discountPriceElement.textContent.replace(/\D/g, ""));
+        const originalPriceElement = item.querySelector(".item-price");
+        const discountPriceElement = item.querySelector(".item-discount");
+        const discountPercentElement = item.querySelector(".discount-percent");
 
-        if (originalPrice && discountPrice && originalPrice > discountPrice) {
-            const discountPercent = Math.floor(((originalPrice - discountPrice) / originalPrice) * 100); // Làm tròn xuống
-            const discountPercentElement = item.querySelector(".discount-percent");
-            discountPercentElement.textContent = `-${discountPercent}%`;
+        // Kiểm tra sự tồn tại của các thành phần cần thiết
+        if (originalPriceElement && discountPriceElement && discountPercentElement) {
+            const originalPriceText = originalPriceElement.textContent.replace(/\D/g, "").trim();
+            const discountPriceText = discountPriceElement.textContent.replace(/\D/g, "").trim();
+
+            // Chuyển đổi giá trị sang số nguyên (hoặc null nếu không hợp lệ)
+            const originalPrice = originalPriceText ? parseInt(originalPriceText) : null;
+            const discountPrice = discountPriceText ? parseInt(discountPriceText) : null;
+
+            if (originalPrice && discountPrice && originalPrice > discountPrice) {
+                // Tính toán phần trăm giảm giá
+                const discountPercent = Math.floor(((originalPrice - discountPrice) / originalPrice) * 100);
+                discountPercentElement.textContent = `-${discountPercent}%`;
+
+                // Hiển thị giá gạch ngang và màu sắc
+                originalPriceElement.style.textDecoration = "line-through";
+                originalPriceElement.style.color = "gray";
+            } else {
+                // Trường hợp không có giảm giá hợp lệ
+                discountPriceElement.style.display = "none"; // Ẩn giá giảm
+                discountPercentElement.style.display = "none"; // Ẩn phần trăm giảm giá
+
+                // Hiển thị giá gốc với màu đen, không gạch ngang
+                originalPriceElement.style.textDecoration = "none";
+                originalPriceElement.style.color = "black";
+            }
         }
-    }
-});
+    });
 </script>
+
 {% endblock %}

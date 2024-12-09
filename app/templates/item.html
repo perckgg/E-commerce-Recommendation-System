@@ -56,20 +56,47 @@
 		<div class="row">
 			<!-- Product Image -->
 			<div class="col-md-6 text-center">
-				<img src="{{item.image}}" alt="SteelSeries Headset" class="product-image">
+				<img src="{{item.image}}" alt="SteelSeries Headset" class="product-image" onerror="handleImageError(this)">
 			</div>
 			<!-- Product Info -->
 			<div class="col-md-6">
 				<h2>{{item.name}}</h2>
-				<p><strong>Brand:</strong> SteelSeries</p>
-				<p><strong>Color:</strong> Black</p>
-				<p><strong>Compatible Devices:</strong> PC, PS5/PS4, Xbox Series X|S, Switch, Mobile</p>
-				<p><span class="list-price">$99.99</span> <span class="price">$86.74</span></p>
-				<p><strong>In Stock</strong></p>
-				<p class="text-muted">Ships from and sold by Amazon.com</p>
-				<!-- Buttons -->
+				<div class="item-discount-main" id ="item-discount-main">${{ item.discount }}</div>
+				<div class="price-info" style ="display: flex;align-items: center; gap:10px;">
+					<span class="discount-percent-main" id="discount-percent-main">-{{ item.discount_percent }}%</span>
+					<div class="item-price-main" id = "item-price-main">${{ item.price }}</div>
+				</div>
 
+				<p><strong>In Stock</strong></p>
+				<!-- Buttons -->
 				<style>
+					.item-price-main {
+						font-size: 14px;
+						font-weight: bold;
+						color: gray;
+						margin-top: 5px;
+						text-decoration: line-through;
+					}
+					.item-discount-main {
+						font-size: 18px;
+						font-weight: bold;
+						color: #FF728F;
+						margin-top: 5px;
+						margin-bottom: 5px;
+						display: flex;
+					}
+					.discount-percent-main {
+						font-size: 16px;
+						font-weight: bold;
+						color: black;
+						display: flex;
+					}
+					.item-price-main.no-discount {
+					font-size: 18px; 
+					color: black; 
+					text-decoration: none;
+					left: 50%;
+				}
 					.quantity {
 						display: flex;
 						border: 2px solid #3498db;
@@ -128,7 +155,28 @@
 						quantity.value = value + 1
 					}
 				</script>
-
+				<script>
+					// Lấy phần tử giá gốc, giá giảm và phần trăm giảm giá
+					const discountPriceElement = document.querySelector(".item-discount-main");
+					const discountPercentElement = document.querySelector(".discount-percent-main");
+					const originalPriceElement = document.querySelector(".item-price-main");
+					const originalPriceText = originalPriceElement.textContent.replace(/\D/g, "").trim();
+					const discountPriceText = discountPriceElement.textContent.replace(/\D/g, "").trim();
+					
+					
+					
+					// Kiểm tra giá giảm
+					if (!discountPriceText || discountPriceElement.textContent.trim() === "0") {
+						// Ẩn giá giảm và phần trăm giảm giá
+						discountPriceElement.style.display = "none";
+						discountPercentElement.style.display = "none";
+				
+						// Đưa giá gốc lên vị trí giá giảm và thay đổi màu sắc
+						originalPriceElement.style.color = "black"; // Màu giống với giá giảm
+						originalPriceElement.style.fontSize = "18px"; // Đặt cỡ chữ giống giá giảm
+						originalPriceElement.style.textDecoration = "none"; // Bỏ gạch ngang nếu có
+					}
+				</script>
 				<div style="display: flex; align-items: center">
 					<div style="margin-right: 10px; height: 40px;">Quantity: </div>
 					<div class="quantity" style="margin-bottom: 10px">

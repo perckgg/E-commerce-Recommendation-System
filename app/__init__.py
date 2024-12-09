@@ -100,13 +100,13 @@ def home():
     )
 
     # Danh sách sản phẩm gốc
-    items = Item.query.all()
+    items = Item.query.limit(15)
 
     # Danh sách sản phẩm theo giá tăng dần
-    items_by_price = Item.query.order_by(Item.price.asc()).all()
+    items_by_price = Item.query.order_by(Item.price.asc()).limit(15)
 
     # Danh sách sản phẩm theo tên (alphabet)
-    items_by_name = Item.query.order_by(Item.name.asc()).all()
+    items_by_name = Item.query.order_by(Item.name.asc()).limit(15)
 
     return render_template(
         "home.html", 
@@ -346,8 +346,8 @@ def remove(id, quantity):
 def item(id):
     item = Item.query.get(id)
     comment = Comment.query.filter_by(item_id = id).order_by(Comment.created_at.desc()).all()
-    items_by_price = Item.query.order_by(Item.price.asc()).all()
-    items_by_name = Item.query.order_by(Item.name.asc()).all()
+    items_by_price = Item.query.order_by(Item.price.asc()).limit(15)
+    items_by_name = Item.query.order_by(Item.name.asc()).limit(15)
     return render_template(
     'item.html', item=item,
     comment=comment,
@@ -447,30 +447,54 @@ def submit_review(item_id):
     # Lấy dữ liệu từ form
     rating = request.form.get('rating')  # Có thể là None
     comment = request.form.get('content', '').strip()  # Mặc định là chuỗi rỗng nếu không có
-	# Tìm Item liên quan
+    
+    # Tìm Item liên quan
     item = Item.query.get_or_404(item_id)
+    category = Category.query.get_or_404(item.category)  # Lấy category liên quan đến item
+    
     # Kiểm tra đầu vào
     if not rating and not comment:  # Nếu cả rating và comment đều trống
         flash("Please provide a rating or a comment to submit a review.", "warning")
         return redirect(url_for('item', id=item_id))  # Quay lại trang sản phẩm
-    review = Comment(item_id=item_id, user_id=current_user.id, rating=rating, content=comment if comment else '')
-    # Cập nhật rating_count và comment_count
-    # Cập nhật rating_count và comment_count
+    
+    # Tạo review
+    review = Comment(
+        item_id=item_id,
+        user_id=current_user.id,
+        rating=float(rating) if rating else None,
+        content=comment if comment else ''
+    )
+    
+    # Cập nhật rating_count và comment_count của Item
     if rating:
         item.rating_count = (item.rating_count or 0) + 1  # Tăng rating_count
-
+        
         # Lấy tổng các rating hiện tại và thêm rating mới
         total_rating_sum = db.session.query(db.func.sum(Comment.rating)).filter(Comment.item_id == item_id).scalar() or 0
         total_rating_sum += float(rating)
 
-        # Tính trung bình cộng rating
+        # Tính trung bình cộng rating cho Item
         item.rating = total_rating_sum / item.rating_count
-    
+
     item.comment_count = item.comment_count + 1 if item.comment_count else 1  # Tăng comment_count
+    
+    # Cập nhật rating_count và rating_avg của Category
+    if rating:
+        # Tính tổng số lượng đánh giá và tổng điểm rating cho category
+        total_category_rating_count = db.session.query(db.func.sum(Item.rating_count)).filter(Item.category == category.id).scalar() or 0
+        total_category_rating_sum = db.session.query(db.func.sum(Item.rating * Item.rating_count)).filter(Item.category == category.id).scalar() or 0
+
+        # Cập nhật số lượng đánh giá và trung bình đánh giá cho Category
+        category.rating_count = total_category_rating_count
+        category.rating_avg = total_category_rating_sum / total_category_rating_count if total_category_rating_count > 0 else 0.0
+
+    # Lưu review và cập nhật database
     db.session.add(review)
     db.session.commit()
+
     flash("Your review has been submitted!", "success")
     return redirect(url_for('item', id=item_id))
+
 
 
 # Recommendations functions============================================================================================

@@ -8,7 +8,7 @@
                 <div class="item">
                     <div class="item-wrapper">
                         <div class="img-wrapper">
-                            <img src="{{ item.image }}" class="pic">
+                            <img src="{{ item.image }}" class="pic" onerror="handleImageError(this)">
                         </div>
                         <div class="item-info">
                             <!-- Tên sản phẩm, giới hạn dòng hiển thị -->
@@ -36,7 +36,7 @@
                             <!-- Giá sản phẩm -->
                             <div class="item-discount" id ="item-discount">${{item.discount}}</div>
                             <div class="price-info" style ="display: flex;align-items: center; gap:10px;">
-                                <span class="discount-percent" id="discount-percent"></span>
+                                <span class="discount-percent" id="discount-percent">-{{item.discount_percent}}%</span>
                                 <div class="item-price" id = "item-price">${{ item.price }}</div>
                             </div>
                         </div>
@@ -48,7 +48,20 @@
     </div>
     <button class="carousel-btn next-btn"><i class="fa-solid fa-chevron-right"></i></button> <!-- Nút tiến -->
 </div>
+<script>
+    function handleImageError(img) {
 
+        img.style.display = "none";
+        const icon = document.createElement("i");
+        icon.className = "fa-solid fa-cart-shopping";
+        icon.style.color = "#ff728f";
+        icon.style.fontSize = "3rem"; 
+        icon.style.display = "block"; 
+        icon.style.margin = "auto";
+
+        img.parentElement.appendChild(icon);
+    }
+    </script>
 <style>
     /* Ngôi sao */
     .checked {
@@ -132,12 +145,20 @@
         color: #FF728F;
         margin-top: 5px;
         margin-bottom: 5px;
+        visibility: hidden;
     }
     .discount-percent {
         font-size: 16px;
         font-weight: bold;
         color: black;
+        visibility: hidden;
     }
+    .item-price.no-discount {
+    font-size: 18px; 
+    color: black; 
+    text-decoration: none;
+    left: 50%;
+}
  
     .carousel-btn {
         position: absolute;
@@ -172,18 +193,42 @@
 
 <script>
     document.querySelectorAll(".item").forEach(item => {
-    const originalPriceElement = item.querySelector(".item-price");
-    const discountPriceElement = item.querySelector(".item-discount");
-    if (originalPriceElement && discountPriceElement) {
-        const originalPrice = parseInt(originalPriceElement.textContent.replace(/\D/g, ""));
-        const discountPrice = parseInt(discountPriceElement.textContent.replace(/\D/g, ""));
+        const originalPriceElement = item.querySelector(".item-price");
+        const discountPriceElement = item.querySelector(".item-discount");
+        const discountPercentElement = item.querySelector(".discount-percent");
 
-        if (originalPrice && discountPrice && originalPrice > discountPrice) {
-            const discountPercent = Math.floor(((originalPrice - discountPrice) / originalPrice) * 100); // Làm tròn xuống
-            const discountPercentElement = item.querySelector(".discount-percent");
-            discountPercentElement.textContent = `-${discountPercent}%`;
+        // Kiểm tra sự tồn tại của các thành phần cần thiết
+        if (originalPriceElement && discountPriceElement && discountPercentElement) {
+            const originalPriceText = originalPriceElement.textContent.replace(/\D/g, "").trim();
+            const discountPriceText = discountPriceElement.textContent.replace(/\D/g, "").trim();
+
+            // Chuyển đổi giá trị sang số nguyên (hoặc null nếu không hợp lệ)
+            const originalPrice = originalPriceText ? parseInt(originalPriceText) : null;
+            const discountPrice = discountPriceText ? parseInt(discountPriceText) : null;
+
+            if (originalPrice && discountPrice && originalPrice > discountPrice) {
+                // Tính toán phần trăm giảm giá
+
+                // Hiển thị giá gạch ngang và màu sắc
+                originalPriceElement.style.textDecoration = "line-through";
+                originalPriceElement.style.color = "gray";
+                discountPriceElement.style.visibility = "visible";
+                discountPercentElement.style.visibility = "visible";
+                originalPriceElement.classList.remove("no-discount");
+            } else {
+                // Trường hợp không có giảm giá hợp lệ
+                discountPriceElement.style.visibility = "hidden"; // Ẩn giá giảm
+                discountPercentElement.style.visibility = "hidden"; // Ẩn phần trăm giảm giá
+
+                // Hiển thị giá gốc với màu đen, không gạch ngang
+                originalPriceElement.style.textDecoration = "none";
+                originalPriceElement.style.color = "black";
+                originalPriceElement.classList.add("no-discount");
+               
+            }
         }
-    }
-});
+    });
 </script>
+
+
 {% endblock %}
