@@ -92,4 +92,8 @@ class Category(db.Model):
     __tablename__ = "category"
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
     main_category = db.Column(db.String(250),nullable=False)
-    sub_category = db.Column(db.String(250), nullable=False)
+    sub_category = db.Column(db.String(250), nullable=True)
+    rating_avg = db.Column(db.Float(),nullable=True)
+    rating_Count = db.Column(db.FLoat(),nullable = True)
+    
+    
