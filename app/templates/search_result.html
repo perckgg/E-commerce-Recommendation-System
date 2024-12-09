@@ -67,17 +67,23 @@ Search Results - Olist-Ecom
 
     <div class="pagination">
         {% if current_page > 1 %}
-        <a href="{{ url_for('search', query=query, page=current_page - 1) }}">Previous</a>
+            <a href="{{ url_for('search', query=query, page=1) }}">1</a>
+            {% if current_page > 3 %}
+                <span>...</span>
+            {% endif %}
         {% endif %}
-        {% for p in range(1, total_pages + 1) %}
-        <a href="{{ url_for('search', query=query, page=p) }}" class="{% if p == current_page %}active{% endif %}">
-            {{ p }}
-        </a>
+    
+        {% for p in range(start_page, end_page + 1) %}
+            <a href="{{ url_for('search', query=query, page=p) }}"
+               class="{% if current_page == p %}active{% endif %}">{{ p }}</a>
         {% endfor %}
-        {% if current_page < total_pages %}
-        <a href="{{ url_for('search', query=query, page=current_page + 1) }}">Next</a>
+    
+        {% if current_page < total_pages - 2 %}
+            <span>...</span>
+            <a href="{{ url_for('search', query=query, page=total_pages) }}">{{ total_pages }}</a>
         {% endif %}
     </div>
+    
     {% endif %}
 </div>
 <style>
@@ -158,6 +164,10 @@ Search Results - Olist-Ecom
 
 .pagination a:hover {
     background-color: #f992a7;
+}
+.pagination span {
+    padding: 8px 12px;
+    color: #888;
 }
 .checked {
         color: gold; /* Ngôi sao vàng */

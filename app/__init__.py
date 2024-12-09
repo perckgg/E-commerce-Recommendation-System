@@ -171,7 +171,7 @@ def search():
     query = request.args.get('query', '').strip()  # Lấy từ khóa và loại bỏ khoảng trắng thừa
     page = request.args.get('page', 1, type=int)  # Trang hiện tại, mặc định là 1
     per_page = 16  # Số lượng sản phẩm mỗi trang
-
+    max_pages = 50
     if not query:  # Nếu không có từ khóa, trả về thông báo
         flash("Please enter a keyword to search.", "info")
         return redirect(url_for('home'))
@@ -179,10 +179,12 @@ def search():
     # Tìm kiếm sản phẩm theo từ khóa
     search = f"%{query}%"
     items_query = (
-        Item.query.filter(
+        db.session.query(Item)
+        .join(Category, Item.category == Category.id)  # Thực hiện join với bảng Category
+        .filter(
             db.or_(
                 Item.name.ilike(search),
-                Item.category.ilike(search)
+                Category.main_category.ilike(search),  
             )
         )
         .order_by(Item.rating.desc(), Item.rating_count.desc())
@@ -190,8 +192,9 @@ def search():
 
     # Tổng số sản phẩm và số trang
     total_items = items_query.count()
-    total_pages = (total_items + per_page - 1) // per_page
-
+    total_pages = min((total_items + per_page - 1) // per_page, max_pages)
+    start_page = max(1, page - 1)
+    end_page = min(total_pages, page + 2)
     # Lấy sản phẩm cho trang hiện tại
     items = (
         items_query
@@ -206,8 +209,12 @@ def search():
         items=items,
         query=query,
         current_page=page,
-        total_pages=total_pages
+        total_pages=total_pages,
+        max_pages=max_pages,
+        start_page=start_page,
+        end_page=end_page
     )
+
 
 @app.route('/category')
 def search_by_category():
