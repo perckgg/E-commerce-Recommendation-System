@@ -34,7 +34,7 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
-    category = db.Column(db.Text, nullable=False)
+    category = db.Column(db.Integer, nullable=False)
     image = db.Column(db.String(250), nullable=True)
     details = db.Column(db.String(250), nullable=True)
     rating = db.Column(db.Float,nullable = True)

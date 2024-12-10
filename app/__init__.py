@@ -55,6 +55,9 @@ mail.init_app(app)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 
+### initial data
+
+
 with app.app_context():
 	db.create_all()
 
@@ -87,13 +90,43 @@ def home():
 
     # Danh sách sản phẩm theo tên (alphabet)
     items_by_name = Item.query.order_by(Item.name.asc()).limit(15)
+    
+    top_categories = db.session.query(Category.main_category
+    ).join(Item, Item.category == Category.id) \
+    .group_by(Category.main_category) \
+    .order_by(func.sum(Item.rating_count).desc()) \
+    .limit(5) \
+    .all()
+    top_category_values = [category.main_category for category in top_categories]
+    RankedItems = (
+    db.session.query(
+        Item,  # Assuming you're selecting the id of Item, but you can modify this for your needs
+        Category.main_category,
+        func.row_number().over(
+            partition_by=Category.main_category,
+            order_by=Item.rating_count.desc()
+        ).label("row_num")
+    )
+    .join(Category, Item.category == Category.id)
+    .filter(Category.main_category.in_(top_category_values))
+    .subquery()
+    )
 
+    top_items = (
+        db.session.query(RankedItems)
+        .filter(RankedItems.c.row_num <= 10)
+        .all()  
+    )
+    category_map_items = {ele.main_category:[i for i in list(filter(lambda x: x.main_category == ele.main_category,top_items))] for ele in top_categories}
+    print(category_map_items)
     return render_template(
         "home.html", 
         items=items, 
         items_by_price=items_by_price, 
         items_by_name=items_by_name, 
-        cats=cats
+        cats=cats,
+        top_categories=top_categories,
+        category_map_items=category_map_items
     )
 
 
@@ -199,17 +232,19 @@ def search():
 @app.route('/category')
 def search_by_category():
     cats = Category.query.all()
-    category = request.args.get('name','').strip()
+    category = request.args.get('name','')
     limit = request.args.get('limit',10,type=int)
     if not category:  # Nếu không có từ khóa, trả về tất cả sản phẩm
         flash("Please enter a keyword to search.", "info")
         return redirect(url_for('home'))
-    cat = f"%{category}%"
+    
+    cats_id = db.session.query(Category.id).filter(Category.main_category == category).all()
+    cats_id = [i[0] for i in cats_id]
     items = (
-        Item.query.filter(Item.category.ilike(cat))  # Filter by category
-        .order_by(Item.rating_count.desc())  # Sort by rating_count descending
-        .limit(limit)  # Limit the number of results
-        .all()  # Fetch the results
+        Item.query.filter(Item.category.in_(cats_id)) 
+        .order_by(Item.rating_count.desc())
+        .limit(limit)  
+        .all()  
     )
     if not items:
         items = Item.query.order_by(Item.rating.desc(), Item.rating_count.desc()).limit(10).all()

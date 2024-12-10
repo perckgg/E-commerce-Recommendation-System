@@ -139,7 +139,7 @@ Home - Olist-Ecom
 			<ul class="category-list">
 				{% for cat in cats %}
 				<li class="category-item">
-					<a href="/category?name={{cat.main_category}}&limit=10">
+					<a href="/category?name={{cat.main_category | urlencode}}&limit=10">
 						<img src="../static/img/category.png" alt="Book Icon" class="icon" style="border-radius: 5px;">
 						<span>{{cat.main_category}}</span>
 					</a>
@@ -148,7 +148,7 @@ Home - Olist-Ecom
 			</ul>
 		</div>
 		<!-- Content -->
-		<div class="content" style="flex-grow: 1; display: flex; flex-direction: column; gap: 20px;">
+		<div class="content" style="flex-grow: 1; display: flex; flex-direction: column; gap: 20px; max-width: 75%;">
 			<div class="banner-container" style="margin-bottom: 20px;">
 				<div class="banner-slide">
 					<img src="../static/img/xmas.jpg" alt="Banner 1">
@@ -167,7 +167,7 @@ Home - Olist-Ecom
 			<div class="items-container"
 				style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
 				<h3>{{name}}</h3>
-				
+
 			</div>
 			<br>
 			<div class="items-container"
@@ -182,27 +182,42 @@ Home - Olist-Ecom
 			{% else %}
 			<!-- New Arrivals -->
 			<div class="items-container"
-				style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+				style="background: linear-gradient(to bottom, #ffcedb, #ffffff); padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
 				<h3>New Arrivals</h3>
 				<div class="items-grid"
 					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
 					{% with items=items_by_price %}
-						{% include 'listitem.html' %}
+					{% include 'listitem.html' %}
 					{% endwith %}
 				</div>
 			</div>
 
 			<!-- Most Popular -->
 			<div class="items-container"
-				style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+				style="background: linear-gradient(to bottom, #ffcedb, #ffffff); padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
 				<h3>Most Popular</h3>
 				<div class="items-grid"
 					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
 					{% with items=items_by_name %}
-						{% include 'listitem.html' %}
+					{% include 'listitem.html' %}
 					{% endwith %}
 				</div>
 			</div>
+
+			<!-- 5 find categories -->
+			{% for cat,items_cat in category_map_items.items() %}
+			<div class="items-container"
+				style="background: linear-gradient(to bottom, #ffcedb, #ffffff); padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+				<h3>{{cat}}</h3>
+				<div class="items-grid"
+					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
+					{% with items=items_cat %}
+					{% include 'listitem.html' %}
+					{% endwith %}
+				</div>
+			</div>
+			{% endfor %}
+
 			{% endif %}
 		</div>
 		<script>
@@ -228,7 +243,7 @@ Home - Olist-Ecom
 			slides[currentIndex].classList.add('active');
 
 		</script>
-		
+
 	</div>
 	{% if not items %}
 	<div class="flash-error">
