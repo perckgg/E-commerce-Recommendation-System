@@ -25,6 +25,17 @@ Search Results - Olist-Ecom
         <a href="{{ url_for('home') }}">Discover new items</a>
     </div>
     {% else %}
+    <div class="items-container"
+				style="background: linear-gradient(to bottom, #ffcedb, #ffffff); padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+				<h3>Most Popular</h3>
+				<div class="items-grid"
+					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
+					{% with items=recommended_items %}
+					{% include 'listitem.html' %}
+					{% endwith %}
+				</div>
+			</div>
+    <br>
     <div class="product-grid">
         {% for item in items %}
 		<a href="{{ url_for('item', id=item.id) }}">

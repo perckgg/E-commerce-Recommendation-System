@@ -23,7 +23,7 @@ import uuid
 import re
 from sqlalchemy.sql import text
 
-MODEL_SERVER_URL = "http://192.168.1.117:7000/recommend"
+MODEL_SERVER_URL = "http://127.0.0.1:7000/recommend"
 
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -72,6 +72,7 @@ def inject_now():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 @app.route("/")
 def home():
     # Danh mục chính
@@ -99,26 +100,35 @@ def home():
     .all()
     top_category_values = [category.main_category for category in top_categories]
     RankedItems = (
-    db.session.query(
-        Item,  # Assuming you're selecting the id of Item, but you can modify this for your needs
-        Category.main_category,
-        func.row_number().over(
-            partition_by=Category.main_category,
-            order_by=Item.rating_count.desc()
-        ).label("row_num")
-    )
-    .join(Category, Item.category == Category.id)
-    .filter(Category.main_category.in_(top_category_values))
-    .subquery()
-    )
+        db.session.query(
+            Item,
+            Category.main_category,
+            func.row_number().over(
+                partition_by=Category.main_category,
+                order_by=Item.rating_count.desc()
+            ).label("row_num")
+        )
+        .join(Category, Item.category == Category.id)
+        .filter(Category.main_category.in_(top_category_values))
+        .distinct(Item.id)  
+        .subquery()
+        )
+
 
     top_items = (
         db.session.query(RankedItems)
-        .filter(RankedItems.c.row_num <= 10)
-        .all()  
+        .filter(RankedItems.c.row_num <= 10)  
+        .distinct(RankedItems.c.id)  
+        .all()
     )
-    category_map_items = {ele.main_category:[i for i in list(filter(lambda x: x.main_category == ele.main_category,top_items))] for ele in top_categories}
-    print(category_map_items)
+
+    category_map_items = {
+    ele.main_category: [
+        i for i in {item.id: item for item in filter(lambda x: x.main_category == ele.main_category, top_items)}.values()
+    ]
+    for ele in top_categories
+}
+
     return render_template(
         "home.html", 
         items=items, 
@@ -179,18 +189,43 @@ def google_login():
     else:
         flash("Đã xảy ra lỗi khi đăng nhập với Google.", "error")
         return redirect(url_for("login"))
+def get_recommendations(item_name):
+    try:
+        # Gửi yêu cầu POST đến model server
+        response = requests.post(MODEL_SERVER_URL, json={"query": item_name, "top_item": 1})
+        response.raise_for_status()
+        return response.json().get("recommendations", [])
+    except requests.exceptions.RequestException as e:
+        app.logger.error(f"Error contacting model server: {e}")
+        return []
+def get_similar_items(query, limit=15):
+    query = normalize_name(query)
+    sql = text("""
+        SELECT *
+        FROM items
+        WHERE similarity(name, :query) > 0.3
+        ORDER BY similarity(name, :query) DESC
+        LIMIT :limit
+    """)
+    result = db.engine.execute(sql, query=query, limit=limit)
+    return [row for row in result]
 @app.route('/search')
 def search():
     query = request.args.get('query', '').strip()  # Lấy từ khóa và loại bỏ khoảng trắng thừa
     page = request.args.get('page', 1, type=int)  # Trang hiện tại, mặc định là 1
     per_page = 16  # Số lượng sản phẩm mỗi trang
     max_pages = 50
+    
     if not query:  # Nếu không có từ khóa, trả về thông báo
         flash("Please enter a keyword to search.", "info")
         return redirect(url_for('home'))
-
+    recommendations = get_recommendations(query)
+    recommended_items = []
+    if recommendations:
+        recommended_items = get_similar_items(recommendations[0], limit=10)
     # Tìm kiếm sản phẩm theo từ khóa
     search = f"%{query}%"
+    
     items_query = (
         db.session.query(Item)
         .join(Category, Item.category == Category.id)  # Thực hiện join với bảng Category
@@ -202,6 +237,7 @@ def search():
         )
         .order_by(Item.rating.desc(), Item.rating_count.desc())
     )
+
 
     # Tổng số sản phẩm và số trang
     total_items = items_query.count()
@@ -225,7 +261,8 @@ def search():
         total_pages=total_pages,
         max_pages=max_pages,
         start_page=start_page,
-        end_page=end_page
+        end_page=end_page,
+        recommended_items = recommended_items
     )
 
 
@@ -376,26 +413,7 @@ def item(id):
     items_by_name=items_by_name,
     items_by_price=items_by_price,
     )
-def get_recommendations(item_name):
-    try:
-        # Gửi yêu cầu POST đến model server
-        response = requests.post(MODEL_SERVER_URL, json={"query": item_name, "top_item": 10})
-        response.raise_for_status()
-        return response.json().get("recommendations", [])
-    except requests.exceptions.RequestException as e:
-        app.logger.error(f"Error contacting model server: {e}")
-        return []
-def get_similar_items(query, limit=15):
-    query = normalize_name(query)
-    sql = text("""
-        SELECT *
-        FROM items
-        WHERE similarity(name, :query) > 0.3
-        ORDER BY similarity(name, :query) DESC
-        LIMIT :limit
-    """)
-    result = db.engine.execute(sql, query=query, limit=limit)
-    return [row for row in result]
+
 def normalize_name(name):
     name = name.lower()  # Chuyển về chữ thường
     name = re.sub(r'[^\w\s]', '', name)  # Loại bỏ ký tự đặc biệt
@@ -418,7 +436,7 @@ def create_checkout_session():
         # Giả lập thanh toán thành công
         # (Ở đây bạn có thể tích hợp bất kỳ cổng thanh toán nào hoặc mô phỏng quy trình)
         payment_id = str(uuid.uuid4())  # Giả lập Payment ID
-        print(f"Payment successful! Payment ID: {payment_id}, User ID: {current_user.id}, Items: {data}")
+        
 
         # Tạo session giả lập và gọi fulfill_order
         session = {'client_reference_id': current_user.id}
