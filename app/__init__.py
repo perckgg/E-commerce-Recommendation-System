@@ -11,11 +11,16 @@ from .funcs import mail, send_confirmation_email, fulfill_order
 from dotenv import load_dotenv
 from .admin.route import admin
 from itsdangerous import URLSafeTimedSerializer,SignatureExpired, BadSignature
-from sqlalchemy import func
 from datetime import datetime
 import re
 from sqlalchemy.sql import text
-
+from sqlalchemy import func, desc
+import pandas as pd
+import random
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.postgresql import UUID
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 MODEL_SERVER_URL = "http://192.168.1.117:7000/recommend"
 
 
