@@ -398,7 +398,7 @@
 				<h3>From the same Category</h3>
 				<div class="items-grid"
 					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
-					{% with items=items_by_name %}
+					{% with items=items_by_price %}
 						{% include 'listitem_in_item.html' %}
 					{% endwith %}
 				</div>
@@ -408,7 +408,7 @@
 				<h3>You may also like</h3>
 				<div class="items-grid"
 					style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));gap: 20px; ">
-					{% with items=items_by_price %}
+					{% with items=items_by_name %}
 						{% include 'listitem.html' %}
 					{% endwith %}
 				</div>
